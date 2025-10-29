@@ -3,7 +3,7 @@ import { PlaceHolderImages } from './placeholder-images';
 
 const generateSeats = (): SeatingChart => {
   const seatingChart: SeatingChart = { rows: [] };
-  const rowLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+  const rowLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T'];
   
   rowLetters.forEach((rowId, rowIndex) => {
     const row: SeatingRow = { id: rowId, seats: [] };
