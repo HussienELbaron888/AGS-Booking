@@ -1,27 +1,58 @@
 import type { Event, SeatingChart, SeatingRow, Seat } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 
-const generateSeats = (rows: number, seatsPerRow: number): SeatingChart => {
+const generateSeats = (): SeatingChart => {
   const seatingChart: SeatingChart = { rows: [] };
-  for (let i = 0; i < rows; i++) {
-    const rowId = String.fromCharCode(65 + i);
+  const rowLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+  
+  rowLetters.forEach((rowId, rowIndex) => {
     const row: SeatingRow = { id: rowId, seats: [] };
-    for (let j = 1; j <= seatsPerRow; j++) {
-      const isAisle = j === 3 || j === seatsPerRow - 2;
-      const isUnavailable = Math.random() < 0.15; // 15% chance of being unavailable from the start
+    
+    // Left section
+    for (let i = 1; i <= 4; i++) {
       const seat: Seat = {
-        id: `${rowId}${j}`,
-        number: `${rowId}${j}`,
-        status: isUnavailable ? 'unavailable' : 'available',
-        type: isAisle ? 'aisle' : 'seat',
+        id: `${rowId}L${i}`,
+        number: `${i}`,
+        status: Math.random() > 0.2 ? 'available' : 'unavailable',
+        type: 'seat',
+        section: 'left',
       };
-      if (isAisle) {
-        seat.number = '';
-      }
       row.seats.push(seat);
     }
+    
+    // Aisle
+    row.seats.push({ id: `${rowId}-aisle1`, number: '', status: 'available', type: 'aisle', section: 'aisle' });
+    
+    // Center section
+    for (let i = 1; i <= 8; i++) {
+      const seat: Seat = {
+        id: `${rowId}C${i}`,
+        number: `${i}`,
+        status: Math.random() > 0.2 ? 'available' : 'unavailable',
+        type: 'seat',
+        section: 'center',
+      };
+      row.seats.push(seat);
+    }
+    
+    // Aisle
+    row.seats.push({ id: `${rowId}-aisle2`, number: '', status: 'available', type: 'aisle', section: 'aisle' });
+
+    // Right section
+    for (let i = 1; i <= 4; i++) {
+      const seat: Seat = {
+        id: `${rowId}R${i}`,
+        number: `${i}`,
+        status: Math.random() > 0.2 ? 'available' : 'unavailable',
+        type: 'seat',
+        section: 'right',
+      };
+      row.seats.push(seat);
+    }
+    
     seatingChart.rows.push(row);
-  }
+  });
+
   return seatingChart;
 };
 
@@ -34,7 +65,7 @@ export const events: Event[] = [
     description: 'Join us for a magical evening as our talented students perform Shakespeare\'s classic comedy.',
     longDescription: 'Our drama club has been working tirelessly to bring this enchanting story to life. Expect a night of laughter, romance, and spectacular performances under the stars (or at least under our new stage lights!). This is a perfect event for the whole family.',
     image: PlaceHolderImages.find(p => p.id === 'event-1')?.imageUrl || '',
-    seatingChart: generateSeats(8, 12),
+    seatingChart: generateSeats(),
     targetAudience: "Parents, students, and family members",
     keyHighlights: "Live student performances, classic Shakespearean comedy, new stage lighting and sound system"
   },
@@ -46,7 +77,7 @@ export const events: Event[] = [
     description: 'Explore the brilliant minds of our students at the annual Science and Innovation Fair.',
     longDescription: 'From erupting volcanoes to advanced robotics, our students will showcase their incredible projects. Come and be inspired by the next generation of scientists, engineers, and innovators. Interactive exhibits and hands-on activities will be available for all ages.',
     image: PlaceHolderImages.find(p => p.id === 'event-2')?.imageUrl || '',
-    seatingChart: generateSeats(8, 12),
+    seatingChart: generateSeats(),
     targetAudience: "Students, parents, and science enthusiasts",
     keyHighlights: "Student projects, robotics demonstrations, interactive exhibits"
   },
@@ -58,7 +89,7 @@ export const events: Event[] = [
     description: 'Cheer on our student athletes in a day full of exciting competitions and team spirit.',
     longDescription: 'A day of thrilling athletic events, from track and field to team sports. Support your house, enjoy the competitive atmosphere, and celebrate sportsmanship. Food and refreshments will be available throughout the day.',
     image: PlaceHolderImages.find(p => p.id === 'event-3')?.imageUrl || '',
-    seatingChart: generateSeats(8, 12),
+    seatingChart: generateSeats(),
     targetAudience: "Entire school community",
     keyHighlights: "Track and field events, team sports finals, house competitions"
   },

@@ -33,16 +33,22 @@ export function Seat({ seat, isSelected, onClick, size }: SeatProps) {
       disabled={!isClickable}
       style={{ width: `${size}px`, height: `${size}px` }}
       className={cn(
-        'flex items-center justify-center rounded-lg transition-all duration-200 relative',
+        'flex items-center justify-center rounded-t-lg transition-all duration-200 relative',
         isClickable ? 'cursor-pointer' : 'cursor-not-allowed',
         status === 'available' && 'text-card-foreground/50 hover:text-accent hover:scale-110',
         status === 'selected' && 'text-accent scale-110 shadow-lg',
         status === 'unavailable' && 'text-muted-foreground/30 opacity-50',
-        status === 'reserved' && 'text-muted-foreground/30 opacity-50'
+        status === 'reserved' && 'text-muted-foreground/30 opacity-50',
+        seat.section === 'left' && 'transform -rotate-[15deg]',
+        seat.section === 'right' && 'transform rotate-[15deg]'
       )}
     >
       {seatIcon}
-      <span className="absolute text-background font-bold text-[10px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 mt-[-2px]">
+      <span className={cn(
+        "absolute text-background font-bold text-[10px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 mt-[-2px]",
+        seat.section === 'left' && 'transform rotate-[15deg]',
+        seat.section === 'right' && 'transform -rotate-[15deg]'
+        )}>
         {seat.number}
       </span>
     </button>

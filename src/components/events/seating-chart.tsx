@@ -15,19 +15,23 @@ interface SeatingChartProps {
 
 export function SeatingChart({ seatingChart, selectedSeats, onSeatClick }: SeatingChartProps) {
   const [scale, setScale] = useState(1);
-  const seatSize = 40; // in pixels
+  const seatSize = 32; // in pixels
+  const gapSize = 8; // in pixels
 
-  const handleZoomIn = () => setScale(s => Math.min(s + 0.1, 2));
+  const handleZoomIn = () => setScale(s => Math.min(s + 0.1, 1.5));
   const handleZoomOut = () => setScale(s => Math.max(s - 0.1, 0.5));
   const handleResetZoom = () => setScale(1);
+
+  const numSeats = seatingChart.rows[0]?.seats.length || 0;
+  const chartWidth = numSeats * (seatSize + gapSize);
 
   return (
     <div className="w-full">
       <div className="bg-muted/50 p-2 rounded-md mb-4 flex items-center justify-between">
         <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs items-center">
-            <div className="flex items-center gap-2"><div className="w-4 h-4 rounded-md border bg-card"></div>Available</div>
-            <div className="flex items-center gap-2"><div className="w-4 h-4 rounded-md bg-accent"></div>Selected</div>
-            <div className="flex items-center gap-2"><div className="w-4 h-4 rounded-md bg-muted-foreground/50 opacity-50"></div>Unavailable</div>
+            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm border bg-card"></div>Available</div>
+            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-accent"></div>Selected</div>
+            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-muted-foreground/50 opacity-50"></div>Unavailable</div>
         </div>
         <div className="flex items-center gap-1">
           <Button variant="outline" size="icon" onClick={handleZoomOut} className="h-8 w-8"><ZoomOut className="h-4 w-4" /></Button>
@@ -37,16 +41,14 @@ export function SeatingChart({ seatingChart, selectedSeats, onSeatClick }: Seati
       </div>
       
       <ScrollArea className="w-full h-[500px] border rounded-lg bg-background">
-        <div className="relative p-8 flex justify-center items-center" style={{ minWidth: `${seatingChart.rows[0].seats.length * seatSize * scale + 64}px`}}>
+        <div className="relative p-4 sm:p-8 flex justify-center items-center" style={{ minWidth: `${chartWidth * scale + 64}px`}}>
           <div
             className="transition-transform duration-300 origin-center"
             style={{ transform: `scale(${scale})` }}
           >
-            <div className="bg-muted p-2 rounded-t-lg text-center font-semibold text-muted-foreground mb-8 text-sm" style={{ width: `${seatingChart.rows[0].seats.length * (seatSize + 8)}px` }}>STAGE</div>
-
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col-reverse gap-2">
               {seatingChart.rows.map(row => (
-                <div key={row.id} className="flex items-center justify-center gap-2">
+                <div key={row.id} className="flex items-center justify-center" style={{ gap: `${gapSize}px`}}>
                   <div className="w-8 text-center font-bold text-muted-foreground">{row.id}</div>
                   {row.seats.map(seat => (
                     <Seat
@@ -61,6 +63,8 @@ export function SeatingChart({ seatingChart, selectedSeats, onSeatClick }: Seati
                 </div>
               ))}
             </div>
+
+            <div className="bg-muted mt-8 p-2 rounded-lg text-center font-semibold text-muted-foreground text-sm shadow-inner" style={{ width: `${chartWidth}px`, marginLeft: 'auto', marginRight: 'auto' }}>STAGE</div>
           </div>
         </div>
         <ScrollBar orientation="horizontal" />
