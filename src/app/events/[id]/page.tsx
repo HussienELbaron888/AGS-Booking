@@ -6,6 +6,7 @@ import { Calendar, Clock, Info, Users } from 'lucide-react';
 import { SeatingChartWrapper } from '@/components/events/seating-chart-wrapper';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useEffect, useState, use } from 'react';
+import type { Event } from '@/lib/types';
 
 interface EventPageProps {
   params: Promise<{
@@ -15,6 +16,7 @@ interface EventPageProps {
 
 export default function EventPage({ params }: EventPageProps) {
   const [lang, setLang] = useState('en');
+  const [event, setEvent] = useState<Event | null>(null);
   const { id } = use(params);
 
   useEffect(() => {
@@ -25,13 +27,18 @@ export default function EventPage({ params }: EventPageProps) {
     observer.observe(html, { attributes: true, attributeFilter: ['lang'] });
     setLang(html.lang || 'en'); // Initial set
 
-    return () => observer.disconnect();
-  }, []);
-  
-  const event = getEventById(id);
+    // Fetch event data on the client to avoid hydration issues with random seat statuses
+    const eventData = getEventById(id);
+    if (eventData) {
+      setEvent(eventData);
+    }
 
+    return () => observer.disconnect();
+  }, [id]);
+  
   if (!event) {
-    notFound();
+    // You can render a loading skeleton here
+    return <div>Loading...</div>;
   }
   
   const imagePlaceholder = PlaceHolderImages.find(p => p.imageUrl === event.image);
