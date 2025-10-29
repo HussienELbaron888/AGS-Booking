@@ -37,6 +37,17 @@ export function SeatingChart({ seatingChart, selectedSeats, onSeatClick }: Seati
   const numSeats = seatingChart.rows[0]?.seats.length || 0;
   const chartWidth = numSeats * (seatSize + gapSize);
 
+  const leftSeats = seatingChart.rows[0].seats.filter(s => s.section === 'left').length;
+  const centerSeats = seatingChart.rows[0].seats.filter(s => s.section === 'center').length;
+  const rightSeats = seatingChart.rows[0].seats.filter(s => s.section === 'right').length;
+  const aisleSeats = seatingChart.rows[0].seats.filter(s => s.type === 'aisle').length / 2;
+
+  const leftWidth = leftSeats * (seatSize + gapSize);
+  const centerWidth = centerSeats * (seatSize + gapSize);
+  const rightWidth = rightSeats * (seatSize + gapSize);
+  const aisleWidth = aisleSeats * (seatSize + gapSize);
+
+
   return (
     <div className="w-full" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <div className="bg-muted/50 p-2 rounded-md mb-4 flex items-center justify-between">
@@ -58,8 +69,13 @@ export function SeatingChart({ seatingChart, selectedSeats, onSeatClick }: Seati
             className="transition-transform duration-300 origin-center"
             style={{ transform: `scale(${scale})` }}
           >
-            <div className="bg-primary/80 mb-8 p-2 rounded-lg text-center font-semibold text-primary-foreground text-sm shadow-inner" style={{ width: `${chartWidth * 0.6}px`, marginLeft: 'auto', marginRight: 'auto' }}>
+            <div className="bg-primary/80 mb-4 p-2 rounded-lg text-center font-semibold text-primary-foreground text-sm shadow-inner" style={{ width: `${chartWidth * 0.6}px`, marginLeft: 'auto', marginRight: 'auto' }}>
               S T A G E
+            </div>
+            <div className="flex justify-center text-sm font-bold text-muted-foreground mb-2" style={{ gap: `${aisleWidth}px`}}>
+                <div style={{width: leftWidth}} className="text-center">{lang === 'en' ? 'Section L' : 'قسم L'}</div>
+                <div style={{width: centerWidth}} className="text-center">{lang === 'en' ? 'Section C' : 'قسم C'}</div>
+                <div style={{width: rightWidth}} className="text-center">{lang === 'en' ? 'Section R' : 'قسم R'}</div>
             </div>
             <div className="flex flex-col gap-2">
               {seatingChart.rows.map(row => (
