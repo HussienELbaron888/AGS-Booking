@@ -1,0 +1,50 @@
+'use client';
+
+import { cn } from '@/lib/utils';
+import type { Seat as SeatType } from '@/lib/types';
+
+interface SeatProps {
+  seat: SeatType;
+  isSelected: boolean;
+  onClick: (seat: SeatType) => void;
+  size: number;
+}
+
+const seatIcon = (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+    <path d="M4 18.5v-3.5c0-1.103.897-2 2-2h12c1.103 0 2 .897 2 2v3.5c0 .668-.383 1.253-.968 1.574l-1.688.913A3.001 3.001 0 0 1 15 24H9a3.001 3.001 0 0 1-2.344-2.993l-1.688-.913C4.383 19.753 4 19.168 4 18.5zM6 4h12c1.103 0 2 .897 2 2v6H4V6c0-1.103.897-2 2-2z"></path>
+  </svg>
+);
+
+
+export function Seat({ seat, isSelected, onClick, size }: SeatProps) {
+  if (seat.type === 'aisle' || seat.type === 'empty') {
+    return <div style={{ width: `${size}px`, height: `${size}px` }} />;
+  }
+
+  const status = isSelected ? 'selected' : seat.status;
+  
+  const isClickable = status === 'available' || status === 'selected';
+
+  return (
+    <button
+      aria-label={`Seat ${seat.number}, Status: ${status}`}
+      onClick={() => onClick(seat)}
+      disabled={!isClickable}
+      style={{ width: `${size}px`, height: `${size}px` }}
+      className={cn(
+        'flex items-center justify-center rounded-lg transition-all duration-200 relative',
+        isClickable ? 'cursor-pointer' : 'cursor-not-allowed',
+        status === 'available' && 'text-card-foreground/50 hover:text-accent hover:scale-110',
+        status === 'selected' && 'text-accent scale-110 shadow-lg',
+        status === 'unavailable' && 'text-muted-foreground/30 opacity-50',
+        status === 'reserved' && 'text-muted-foreground/30 opacity-50'
+      )}
+    >
+      {seatIcon}
+      <span className="absolute text-background font-bold text-[10px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 mt-[-2px]">
+        {seat.number}
+      </span>
+    </button>
+  );
+}
