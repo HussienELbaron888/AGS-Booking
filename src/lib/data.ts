@@ -3,17 +3,17 @@ import { PlaceHolderImages } from './placeholder-images';
 
 const generateSeats = (): SeatingChart => {
   const seatingChart: SeatingChart = { rows: [] };
-  const rowLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T'];
+  const rowLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
   
-  rowLetters.forEach((rowId) => {
+  rowLetters.forEach((rowId, rowIndex) => {
     const row: SeatingRow = { id: rowId, seats: [] };
     
-    // Left section (7 seats)
-    for (let i = 1; i <= 7; i++) {
+    // Left section (4 seats)
+    for (let i = 1; i <= 4; i++) {
       const seat: Seat = {
         id: `${rowId}L${i}`,
         number: `${i}`,
-        status: Math.random() > 0.2 ? 'available' : 'unavailable',
+        status: Math.random() > 0.3 ? 'available' : 'unavailable',
         type: 'seat',
         section: 'left',
       };
@@ -22,14 +22,24 @@ const generateSeats = (): SeatingChart => {
     
     // Aisle (empty space)
     row.seats.push({ id: `${rowId}-aisle1`, number: '', status: 'available', type: 'aisle', section: 'aisle' });
-    row.seats.push({ id: `${rowId}-aisle2`, number: '', status: 'available', type: 'aisle', section: 'aisle' });
     
-    // Center section (12 seats)
-    for (let i = 1; i <= 12; i++) {
+    // Center section (8 seats)
+    for (let i = 1; i <= 8; i++) {
+      // Skip seats in the first row of Section C
+      if (rowIndex === 0) {
+          row.seats.push({
+              id: `${rowId}C${i}`,
+              number: '',
+              status: 'available',
+              type: 'empty',
+              section: 'center',
+          });
+          continue;
+      }
       const seat: Seat = {
         id: `${rowId}C${i}`,
         number: `${i}`,
-        status: Math.random() > 0.2 ? 'available' : 'unavailable',
+        status: Math.random() > 0.3 ? 'available' : 'unavailable',
         type: 'seat',
         section: 'center',
       };
@@ -37,15 +47,14 @@ const generateSeats = (): SeatingChart => {
     }
     
     // Aisle (empty space)
-    row.seats.push({ id: `${rowId}-aisle3`, number: '', status: 'available', type: 'aisle', section: 'aisle' });
-    row.seats.push({ id: `${rowId}-aisle4`, number: '', status: 'available', type: 'aisle', section: 'aisle' });
+    row.seats.push({ id: `${rowId}-aisle2`, number: '', status: 'available', type: 'aisle', section: 'aisle' });
 
-    // Right section (7 seats)
-    for (let i = 1; i <= 7; i++) {
+    // Right section (4 seats)
+    for (let i = 1; i <= 4; i++) {
       const seat: Seat = {
         id: `${rowId}R${i}`,
         number: `${i}`,
-        status: Math.random() > 0.2 ? 'available' : 'unavailable',
+        status: Math.random() > 0.3 ? 'available' : 'unavailable',
         type: 'seat',
         section: 'right',
       };
