@@ -22,12 +22,12 @@ import { generateEventDescription } from "@/ai/flows/generate-event-description"
 import { useTransition } from "react";
 
 const formSchema = z.object({
-  eventName: z.string().min(3, "يجب أن يكون اسم الحدث 3 أحرف على الأقل."),
-  eventDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "صيغة التاريخ غير صالحة." }),
-  eventTime: z.string().min(1, "الوقت مطلوب."),
-  eventDescription: z.string().min(10, "يجب أن يكون الوصف 10 أحرف على الأقل."),
-  targetAudience: z.string().min(3, "يجب أن يكون الجمهور المستهدف 3 أحرف على الأقل."),
-  keyHighlights: z.string().min(3, "يجب أن تكون النقاط الرئيسية 3 أحرف على الأقل."),
+  eventName: z.string().min(3, "Event name must be at least 3 characters."),
+  eventDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Invalid date format." }),
+  eventTime: z.string().min(1, "Time is required."),
+  eventDescription: z.string().min(10, "Description must be at least 10 characters."),
+  targetAudience: z.string().min(3, "Target audience must be at least 3 characters."),
+  keyHighlights: z.string().min(3, "Key highlights must be at least 3 characters."),
   promotionalText: z.string().optional(),
 });
 
@@ -65,8 +65,8 @@ export function EventForm() {
     if (!inputForAI.eventName || !inputForAI.eventDate || !inputForAI.eventDescription) {
       toast({
         variant: "destructive",
-        title: "معلومات ناقصة",
-        description: "يرجى ملء اسم الحدث والتاريخ ووصف موجز قبل الإنشاء.",
+        title: "Missing Information",
+        description: "Please fill in the event name, date, and a brief description before generating.",
       });
       return;
     }
@@ -77,15 +77,15 @@ export function EventForm() {
         form.setValue("eventDescription", result.description, { shouldValidate: true });
         form.setValue("promotionalText", result.promotionalText, { shouldValidate: true });
         toast({
-          title: "تم إنشاء المحتوى!",
-          description: "تم تحديث الوصف والنص الترويجي.",
+          title: "Content Generated!",
+          description: "The description and promotional text have been updated.",
         });
       } catch (error) {
         console.error("AI Generation Error:", error);
         toast({
           variant: "destructive",
-          title: "فشل الإنشاء",
-          description: "ไม่สามารถสร้างเนื้อหาได้ กรุณาลองใหม่อีกครั้ง",
+          title: "Generation Failed",
+          description: "Could not generate content. Please try again.",
         });
       }
     });
@@ -94,15 +94,15 @@ export function EventForm() {
   function onSubmit(values: EventFormData) {
     console.log(values);
     toast({
-      title: "تم حفظ الحدث",
-      description: "تم حفظ تفاصيل الحدث بنجاح.",
+      title: "Event Saved",
+      description: "The event details have been saved successfully.",
     });
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>تفاصيل الحدث</CardTitle>
+        <CardTitle>Event Details</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -113,9 +113,9 @@ export function EventForm() {
                 name="eventName"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>اسم الحدث</FormLabel>
+                    <FormLabel>Event Name</FormLabel>
                     <FormControl>
-                        <Input placeholder="مثال: مسرحية المدرسة السنوية" {...field} />
+                        <Input placeholder="e.g., Annual School Play" {...field} />
                     </FormControl>
                     <FormMessage />
                     </FormItem>
@@ -126,9 +126,9 @@ export function EventForm() {
                 name="targetAudience"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>الجمهور المستهدف</FormLabel>
+                    <FormLabel>Target Audience</FormLabel>
                     <FormControl>
-                        <Input placeholder="مثال: الآباء والطلاب" {...field} />
+                        <Input placeholder="e.g., Parents, Students" {...field} />
                     </FormControl>
                     <FormMessage />
                     </FormItem>
@@ -139,7 +139,7 @@ export function EventForm() {
                 name="eventDate"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>تاريخ الحدث</FormLabel>
+                    <FormLabel>Event Date</FormLabel>
                     <FormControl>
                         <Input type="date" {...field} />
                     </FormControl>
@@ -152,7 +152,7 @@ export function EventForm() {
                 name="eventTime"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>وقت الحدث</FormLabel>
+                    <FormLabel>Event Time</FormLabel>
                     <FormControl>
                         <Input type="time" {...field} />
                     </FormControl>
@@ -166,12 +166,12 @@ export function EventForm() {
                 name="keyHighlights"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>أهم النقاط</FormLabel>
+                    <FormLabel>Key Highlights</FormLabel>
                     <FormControl>
-                        <Textarea placeholder="اذكر أهم عوامل الجذب أو المتحدثين أو الأنشطة..." {...field} />
+                        <Textarea placeholder="List main attractions, speakers, activities..." {...field} />
                     </FormControl>
                      <FormDescription>
-                        يستخدمها الذكاء الاصطناعي لإنشاء محتوى أكثر جاذبية.
+                        This is used by the AI to generate more engaging content.
                     </FormDescription>
                     <FormMessage />
                     </FormItem>
@@ -183,18 +183,18 @@ export function EventForm() {
               render={({ field }) => (
                 <FormItem>
                   <div className="flex items-center justify-between">
-                    <FormLabel>الوصف الكامل للحدث</FormLabel>
+                    <FormLabel>Full Event Description</FormLabel>
                     <Button type="button" variant="outline" size="sm" onClick={handleGenerateContent} disabled={isGenerating}>
                         {isGenerating ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         ) : (
                             <WandSparkles className="mr-2 h-4 w-4" />
                         )}
-                        إنشاء بواسطة الذكاء الاصطناعي
+                        Generate with AI
                     </Button>
                   </div>
                   <FormControl>
-                    <Textarea rows={6} placeholder="وصف تفصيلي للحدث..." {...field} />
+                    <Textarea rows={6} placeholder="A detailed description of the event..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -205,15 +205,15 @@ export function EventForm() {
               name="promotionalText"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>نص ترويجي (لوسائل التواصل الاجتماعي / الإعلانات)</FormLabel>
+                  <FormLabel>Promotional Text (for Social Media / Ads)</FormLabel>
                   <FormControl>
-                    <Textarea rows={4} placeholder="سيظهر النص الترويجي الذي تم إنشاؤه بواسطة الذكاء الاصطناعي هنا." {...field} />
+                    <Textarea rows={4} placeholder="AI-generated promotional text will appear here." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit">حفظ الحدث</Button>
+            <Button type="submit">Save Event</Button>
           </form>
         </Form>
       </CardContent>
