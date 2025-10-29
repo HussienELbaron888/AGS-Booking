@@ -33,7 +33,7 @@ export function EventCard({ event }: EventCardProps) {
   }, []);
 
   return (
-    <Card className="flex flex-col overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl">
+    <Card className="flex flex-col overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <CardHeader className="p-0">
         <div className="relative h-48 w-full">
           <Image
@@ -51,7 +51,7 @@ export function EventCard({ event }: EventCardProps) {
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4 text-accent" />
-            <span>{new Date(event.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+            <span>{new Date(event.date).toLocaleDateString(lang === 'ar' ? 'ar-SA' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
           </div>
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-accent" />

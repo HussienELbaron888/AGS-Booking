@@ -19,7 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, WandSparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { generateEventDescription } from "@/ai/flows/generate-event-description";
-import { useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 
 const formSchema = z.object({
   eventName: z.string().min(3, "Event name must be at least 3 characters."),
@@ -36,6 +36,18 @@ type EventFormData = z.infer<typeof formSchema>;
 export function EventForm() {
   const { toast } = useToast();
   const [isGenerating, startGeneratingTransition] = useTransition();
+  const [lang, setLang] = useState('en');
+
+  useEffect(() => {
+    const html = document.documentElement;
+    const observer = new MutationObserver(() => {
+      setLang(html.lang || 'en');
+    });
+    observer.observe(html, { attributes: true, attributeFilter: ['lang'] });
+    setLang(html.lang || 'en'); // Initial set
+
+    return () => observer.disconnect();
+  }, []);
 
   const form = useForm<EventFormData>({
     resolver: zodResolver(formSchema),
@@ -65,8 +77,8 @@ export function EventForm() {
     if (!inputForAI.eventName || !inputForAI.eventDate || !inputForAI.eventDescription) {
       toast({
         variant: "destructive",
-        title: "Missing Information",
-        description: "Please fill in the event name, date, and a brief description before generating.",
+        title: lang === 'ar' ? "معلومات ناقصة" : "Missing Information",
+        description: lang === 'ar' ? "يرجى ملء اسم الحدث وتاريخه ووصف موجز قبل الإنشاء." : "Please fill in the event name, date, and a brief description before generating.",
       });
       return;
     }
@@ -77,15 +89,15 @@ export function EventForm() {
         form.setValue("eventDescription", result.description, { shouldValidate: true });
         form.setValue("promotionalText", result.promotionalText, { shouldValidate: true });
         toast({
-          title: "Content Generated!",
-          description: "The description and promotional text have been updated.",
+          title: lang === 'ar' ? "تم إنشاء المحتوى!" : "Content Generated!",
+          description: lang === 'ar' ? "تم تحديث الوصف والنص الترويجي." : "The description and promotional text have been updated.",
         });
       } catch (error) {
         console.error("AI Generation Error:", error);
         toast({
           variant: "destructive",
-          title: "Generation Failed",
-          description: "Could not generate content. Please try again.",
+          title: lang === 'ar' ? "فشل الإنشاء" : "Generation Failed",
+          description: lang === 'ar' ? "ไม่สามารถสร้างเนื้อหาได้ กรุณาลองใหม่" : "Could not generate content. Please try again.",
         });
       }
     });
@@ -94,15 +106,15 @@ export function EventForm() {
   function onSubmit(values: EventFormData) {
     console.log(values);
     toast({
-      title: "Event Saved",
-      description: "The event details have been saved successfully.",
+      title: lang === 'ar' ? "تم حفظ الحدث" : "Event Saved",
+      description: lang === 'ar' ? "تم حفظ تفاصيل الحدث بنجاح." : "The event details have been saved successfully.",
     });
   }
 
   return (
-    <Card>
+    <Card dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <CardHeader>
-        <CardTitle>Event Details</CardTitle>
+        <CardTitle>{lang === 'ar' ? "تفاصيل الحدث" : "Event Details"}</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -113,9 +125,9 @@ export function EventForm() {
                 name="eventName"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Event Name</FormLabel>
+                    <FormLabel>{lang === 'ar' ? "اسم الحدث" : "Event Name"}</FormLabel>
                     <FormControl>
-                        <Input placeholder="e.g., Annual School Play" {...field} />
+                        <Input placeholder={lang === 'ar' ? "مثال: مسرحية المدرسة السنوية" : "e.g., Annual School Play"} {...field} />
                     </FormControl>
                     <FormMessage />
                     </FormItem>
@@ -126,9 +138,9 @@ export function EventForm() {
                 name="targetAudience"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Target Audience</FormLabel>
+                    <FormLabel>{lang === 'ar' ? "الجمهور المستهدف" : "Target Audience"}</FormLabel>
                     <FormControl>
-                        <Input placeholder="e.g., Parents, Students" {...field} />
+                        <Input placeholder={lang === 'ar' ? "مثال: الآباء والطلاب" : "e.g., Parents, Students"} {...field} />
                     </FormControl>
                     <FormMessage />
                     </FormItem>
@@ -139,7 +151,7 @@ export function EventForm() {
                 name="eventDate"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Event Date</FormLabel>
+                    <FormLabel>{lang === 'ar' ? "تاريخ الحدث" : "Event Date"}</FormLabel>
                     <FormControl>
                         <Input type="date" {...field} />
                     </FormControl>
@@ -152,7 +164,7 @@ export function EventForm() {
                 name="eventTime"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Event Time</FormLabel>
+                    <FormLabel>{lang === 'ar' ? "وقت الحدث" : "Event Time"}</FormLabel>
                     <FormControl>
                         <Input type="time" {...field} />
                     </FormControl>
@@ -166,12 +178,12 @@ export function EventForm() {
                 name="keyHighlights"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Key Highlights</FormLabel>
+                    <FormLabel>{lang === 'ar' ? "أبرز النقاط" : "Key Highlights"}</FormLabel>
                     <FormControl>
-                        <Textarea placeholder="List main attractions, speakers, activities..." {...field} />
+                        <Textarea placeholder={lang === 'ar' ? "اذكر أبرز الفعاليات، المتحدثين، الأنشطة..." : "List main attractions, speakers, activities..."} {...field} />
                     </FormControl>
                      <FormDescription>
-                        This is used by the AI to generate more engaging content.
+                        {lang === 'ar' ? "يستخدم هذا بواسطة الذكاء الاصطناعي لتوليد محتوى أكثر جاذبية." : "This is used by the AI to generate more engaging content."}
                     </FormDescription>
                     <FormMessage />
                     </FormItem>
@@ -183,18 +195,18 @@ export function EventForm() {
               render={({ field }) => (
                 <FormItem>
                   <div className="flex items-center justify-between">
-                    <FormLabel>Full Event Description</FormLabel>
+                    <FormLabel>{lang === 'ar' ? "الوصف الكامل للحدث" : "Full Event Description"}</FormLabel>
                     <Button type="button" variant="outline" size="sm" onClick={handleGenerateContent} disabled={isGenerating}>
                         {isGenerating ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         ) : (
                             <WandSparkles className="mr-2 h-4 w-4" />
                         )}
-                        Generate with AI
+                        {lang === 'ar' ? "إنشاء بواسطة الذكاء الاصطناعي" : "Generate with AI"}
                     </Button>
                   </div>
                   <FormControl>
-                    <Textarea rows={6} placeholder="A detailed description of the event..." {...field} />
+                    <Textarea rows={6} placeholder={lang === 'ar' ? "وصف مفصل للحدث..." : "A detailed description of the event..."} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -205,15 +217,15 @@ export function EventForm() {
               name="promotionalText"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Promotional Text (for Social Media / Ads)</FormLabel>
+                  <FormLabel>{lang === 'ar' ? "نص ترويجي (لوسائل التواصل الاجتماعي / الإعلانات)" : "Promotional Text (for Social Media / Ads)"}</FormLabel>
                   <FormControl>
-                    <Textarea rows={4} placeholder="AI-generated promotional text will appear here." {...field} />
+                    <Textarea rows={4} placeholder={lang === 'ar' ? "سيظهر النص الترويجي الذي تم إنشاؤه بواسطة الذكاء الاصطناعي هنا." : "AI-generated promotional text will appear here."} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit">Save Event</Button>
+            <Button type="submit">{lang === 'ar' ? "حفظ الحدث" : "Save Event"}</Button>
           </form>
         </Form>
       </CardContent>
