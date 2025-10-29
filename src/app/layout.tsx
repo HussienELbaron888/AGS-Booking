@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { AppHeader } from "@/components/layout/app-header";
 
 export const metadata: Metadata = {
-  title: 'SeatVerse',
+  title: 'AGS Booking',
   description: 'School Event Seating and Reservation System',
 };
 
