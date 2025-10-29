@@ -5,16 +5,17 @@ import { notFound } from 'next/navigation';
 import { Calendar, Clock, Info, Users } from 'lucide-react';
 import { SeatingChartWrapper } from '@/components/events/seating-chart-wrapper';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 
 interface EventPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function EventPage({ params }: EventPageProps) {
   const [lang, setLang] = useState('en');
+  const { id } = use(params);
 
   useEffect(() => {
     const html = document.documentElement;
@@ -27,7 +28,7 @@ export default function EventPage({ params }: EventPageProps) {
     return () => observer.disconnect();
   }, []);
   
-  const event = getEventById(params.id);
+  const event = getEventById(id);
 
   if (!event) {
     notFound();
@@ -49,12 +50,12 @@ export default function EventPage({ params }: EventPageProps) {
               data-ai-hint={imagePlaceholder?.imageHint}
             />
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold font-headline text-primary mb-4">{event.name}</h1>
+          <h1 className="text-3xl md:text-4xl font-bold font-headline text-primary mb-4">{lang === 'ar' ? event.name : event.name}</h1>
           
           <div className="space-y-4 text-muted-foreground mb-6">
             <div className="flex items-center gap-3">
               <Calendar className="h-5 w-5 text-accent" />
-              <span className="font-medium">{new Date(event.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+              <span className="font-medium">{new Date(event.date).toLocaleDateString(lang === 'ar' ? 'ar-SA' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
             </div>
             <div className="flex items-center gap-3">
               <Clock className="h-5 w-5 text-accent" />
@@ -62,11 +63,11 @@ export default function EventPage({ params }: EventPageProps) {
             </div>
             <div className="flex items-start gap-3">
               <Info className="h-5 w-5 text-accent mt-1 shrink-0" />
-              <p>{event.longDescription}</p>
+              <p>{lang === 'ar' ? event.longDescription : event.longDescription}</p>
             </div>
              <div className="flex items-start gap-3">
               <Users className="h-5 w-5 text-accent mt-1 shrink-0" />
-              <p><span className="font-semibold text-foreground/80">{lang === 'en' ? 'Highlights:' : 'أهم النقاط:'}</span> {event.keyHighlights}</p>
+              <p><span className="font-semibold text-foreground/80">{lang === 'en' ? 'Highlights:' : 'أهم النقاط:'}</span> {lang === 'ar' ? event.keyHighlights : event.keyHighlights}</p>
             </div>
           </div>
         </div>
