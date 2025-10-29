@@ -1,3 +1,4 @@
+'use client';
 import Link from "next/link"
 
 import {
@@ -19,17 +20,31 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { MoreHorizontal, Pencil, Trash2, Eye } from "lucide-react"
 import type { Event } from "@/lib/types"
+import { useEffect, useState } from "react";
 
 export function EventsDataTable({ data }: { data: Event[] }) {
+  const [lang, setLang] = useState('en');
+
+  useEffect(() => {
+    const html = document.documentElement;
+    const observer = new MutationObserver(() => {
+      setLang(html.lang || 'en');
+    });
+    observer.observe(html, { attributes: true, attributeFilter: ['lang'] });
+    setLang(html.lang || 'en'); // Initial set
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="rounded-md border bg-card">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Time</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead>{lang === 'en' ? 'Name' : 'الاسم'}</TableHead>
+            <TableHead>{lang === 'en' ? 'Date' : 'التاريخ'}</TableHead>
+            <TableHead>{lang === 'en' ? 'Time' : 'الوقت'}</TableHead>
+            <TableHead className="text-right">{lang === 'en' ? 'Actions' : 'الإجراءات'}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -40,7 +55,7 @@ export function EventsDataTable({ data }: { data: Event[] }) {
                 <TableCell>{new Date(event.date).toLocaleDateString()}</TableCell>
                 <TableCell>{event.time}</TableCell>
                 <TableCell className="text-right">
-                  <DropdownMenu>
+                  <DropdownMenu dir={lang === 'ar' ? 'rtl' : 'ltr'}>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="h-8 w-8 p-0">
                         <span className="sr-only">Open menu</span>
@@ -48,23 +63,23 @@ export function EventsDataTable({ data }: { data: Event[] }) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                      <DropdownMenuLabel>{lang === 'en' ? 'Actions' : 'الإجراءات'}</DropdownMenuLabel>
                       <DropdownMenuItem asChild>
                         <Link href={`/events/${event.id}`}>
-                            <Eye className="mr-2 h-4 w-4" />
-                            View
+                            <Eye className="mr-2 h-4 w-4 rtl:ml-2 rtl:mr-0" />
+                            {lang === 'en' ? 'View' : 'عرض'}
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link href={`/admin/events/new`}> 
-                            <Pencil className="mr-2 h-4 w-4" />
-                            Edit
+                            <Pencil className="mr-2 h-4 w-4 rtl:ml-2 rtl:mr-0" />
+                            {lang === 'en' ? 'Edit' : 'تعديل'}
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10">
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
+                        <Trash2 className="mr-2 h-4 w-4 rtl:ml-2 rtl:mr-0" />
+                        {lang === 'en' ? 'Delete' : 'حذف'}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -74,7 +89,7 @@ export function EventsDataTable({ data }: { data: Event[] }) {
           ) : (
             <TableRow>
               <TableCell colSpan={4} className="h-24 text-center">
-                No events found.
+                {lang === 'en' ? 'No events found.' : 'لم يتم العثور على أحداث.'}
               </TableCell>
             </TableRow>
           )}

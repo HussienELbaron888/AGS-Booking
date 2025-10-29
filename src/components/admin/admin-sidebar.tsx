@@ -4,23 +4,38 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LayoutDashboard, CalendarPlus, BarChart3, Users, Ticket } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-const navItems = [
-  { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/admin/events', label: 'Events', icon: CalendarPlus },
-  { href: '/admin/bookings', label: 'Bookings', icon: Ticket },
-  { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
-  { href: '/admin/users', label: 'Users', icon: Users },
-];
+import { useEffect, useState } from 'react';
 
 export function AdminSidebar() {
   const pathname = usePathname();
+  const [lang, setLang] = useState('en');
+
+  useEffect(() => {
+    const html = document.documentElement;
+    if (html) {
+      const observer = new MutationObserver(() => {
+        setLang(html.lang || 'en');
+      });
+      observer.observe(html, { attributes: true, attributeFilter: ['lang'] });
+      setLang(html.lang || 'en'); // Initial set
+
+      return () => observer.disconnect();
+    }
+  }, []);
+
+  const navItems = [
+    { href: '/admin', label: lang === 'en' ? 'Dashboard' : 'لوحة التحكم', icon: LayoutDashboard },
+    { href: '/admin/events', label: lang === 'en' ? 'Events' : 'الأحداث', icon: CalendarPlus },
+    { href: '/admin/bookings', label: lang === 'en' ? 'Bookings' : 'الحجوزات', icon: Ticket },
+    { href: '/admin/analytics', label: lang === 'en' ? 'Analytics' : 'التحليلات', icon: BarChart3 },
+    { href: '/admin/users', label: lang === 'en' ? 'Users' : 'المستخدمون', icon: Users },
+  ];
 
   return (
-    <aside className="w-64 bg-card border-r border-border flex flex-col">
+    <aside className="w-64 bg-card border-r border-border flex-col hidden md:flex">
       <div className="p-4 border-b">
          <Link href="/admin" className="flex items-center gap-2 text-lg font-bold font-headline text-primary">
-            Admin Panel
+            {lang === 'en' ? 'Admin Panel' : 'لوحة الإدارة'}
          </Link>
       </div>
       <nav className="flex-1 p-4 space-y-2">

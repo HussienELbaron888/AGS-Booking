@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { SeatingChart as SeatingChartType, Seat as SeatType } from '@/lib/types';
 import { Seat } from './seat';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,18 @@ export function SeatingChart({ seatingChart, selectedSeats, onSeatClick }: Seati
   const [scale, setScale] = useState(1);
   const seatSize = 32; // in pixels
   const gapSize = 8; // in pixels
+  const [lang, setLang] = useState('en');
+
+  useEffect(() => {
+    const html = document.documentElement;
+    const observer = new MutationObserver(() => {
+      setLang(html.lang || 'en');
+    });
+    observer.observe(html, { attributes: true, attributeFilter: ['lang'] });
+    setLang(html.lang || 'en'); // Initial set
+
+    return () => observer.disconnect();
+  }, []);
 
   const handleZoomIn = () => setScale(s => Math.min(s + 0.1, 1.5));
   const handleZoomOut = () => setScale(s => Math.max(s - 0.1, 0.5));
@@ -26,12 +38,12 @@ export function SeatingChart({ seatingChart, selectedSeats, onSeatClick }: Seati
   const chartWidth = numSeats * (seatSize + gapSize);
 
   return (
-    <div className="w-full">
+    <div className="w-full" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <div className="bg-muted/50 p-2 rounded-md mb-4 flex items-center justify-between">
         <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs items-center">
-            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm border bg-card"></div>Available</div>
-            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-accent"></div>Selected</div>
-            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-muted-foreground/50 opacity-50"></div>Unavailable</div>
+            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm border bg-card"></div>{lang === 'en' ? 'Available' : 'متاح'}</div>
+            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-accent"></div>{lang === 'en' ? 'Selected' : 'محدد'}</div>
+            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-muted-foreground/50 opacity-50"></div>{lang === 'en' ? 'Unavailable' : 'غير متاح'}</div>
         </div>
         <div className="flex items-center gap-1">
           <Button variant="outline" size="icon" onClick={handleZoomOut} className="h-8 w-8"><ZoomOut className="h-4 w-4" /></Button>
@@ -64,7 +76,9 @@ export function SeatingChart({ seatingChart, selectedSeats, onSeatClick }: Seati
               ))}
             </div>
 
-            <div className="bg-muted mt-8 p-2 rounded-lg text-center font-semibold text-muted-foreground text-sm shadow-inner" style={{ width: `${chartWidth}px`, marginLeft: 'auto', marginRight: 'auto' }}>STAGE</div>
+            <div className="bg-muted mt-8 p-2 rounded-lg text-center font-semibold text-muted-foreground text-sm shadow-inner" style={{ width: `${chartWidth}px`, marginLeft: 'auto', marginRight: 'auto' }}>
+              {lang === 'en' ? 'STAGE' : 'المسرح'}
+            </div>
           </div>
         </div>
         <ScrollBar orientation="horizontal" />

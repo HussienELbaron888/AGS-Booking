@@ -36,7 +36,7 @@ export function AppHeader() {
       <div className="container mx-auto flex items-center justify-between p-4">
         <Link href="/" className="flex items-center gap-2 text-xl font-bold font-headline">
           <Ticket className="text-accent" />
-          <span>SeatVerse</span>
+          <span>{lang === 'en' ? 'SeatVerse' : 'سيت فيرس'}</span>
         </Link>
         <nav className="hidden md:flex items-center gap-4">
           {navLinks.map(link => (
@@ -68,7 +68,7 @@ export function AppHeader() {
                 </span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
               <DropdownMenuItem>
                 {lang === 'en' ? 'My Bookings' : 'حجوزاتي'}
               </DropdownMenuItem>

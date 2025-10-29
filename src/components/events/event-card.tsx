@@ -1,3 +1,4 @@
+'use client';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Calendar, Clock, ArrowRight } from 'lucide-react';
@@ -11,12 +12,26 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import type { Event } from '@/lib/types';
+import { useEffect, useState } from 'react';
 
 interface EventCardProps {
   event: Event;
 }
 
 export function EventCard({ event }: EventCardProps) {
+  const [lang, setLang] = useState('en');
+
+  useEffect(() => {
+    const html = document.documentElement;
+    const observer = new MutationObserver(() => {
+      setLang(html.lang || 'en');
+    });
+    observer.observe(html, { attributes: true, attributeFilter: ['lang'] });
+    setLang(html.lang || 'en'); // Initial set
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <Card className="flex flex-col overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl">
       <CardHeader className="p-0">
@@ -47,7 +62,7 @@ export function EventCard({ event }: EventCardProps) {
       <CardFooter className="p-6 pt-0">
         <Button asChild className="w-full bg-primary hover:bg-primary/90">
           <Link href={`/events/${event.id}`}>
-            View Details & Book
+            {lang === 'en' ? 'View Details & Book' : 'عرض التفاصيل والحجز'}
             <ArrowRight className="ml-2 h-4 w-4 rtl:mr-2 rtl:ml-0" />
           </Link>
         </Button>

@@ -1,9 +1,11 @@
+'use client';
 import { getEventById } from '@/lib/data';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { Calendar, Clock, Info, Users } from 'lucide-react';
 import { SeatingChartWrapper } from '@/components/events/seating-chart-wrapper';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { useEffect, useState } from 'react';
 
 interface EventPageProps {
   params: {
@@ -12,6 +14,19 @@ interface EventPageProps {
 }
 
 export default function EventPage({ params }: EventPageProps) {
+  const [lang, setLang] = useState('en');
+
+  useEffect(() => {
+    const html = document.documentElement;
+    const observer = new MutationObserver(() => {
+      setLang(html.lang || 'en');
+    });
+    observer.observe(html, { attributes: true, attributeFilter: ['lang'] });
+    setLang(html.lang || 'en'); // Initial set
+
+    return () => observer.disconnect();
+  }, []);
+  
   const event = getEventById(params.id);
 
   if (!event) {
@@ -51,7 +66,7 @@ export default function EventPage({ params }: EventPageProps) {
             </div>
              <div className="flex items-start gap-3">
               <Users className="h-5 w-5 text-accent mt-1 shrink-0" />
-              <p><span className="font-semibold text-foreground/80">Highlights:</span> {event.keyHighlights}</p>
+              <p><span className="font-semibold text-foreground/80">{lang === 'en' ? 'Highlights:' : 'أهم النقاط:'}</span> {event.keyHighlights}</p>
             </div>
           </div>
         </div>
