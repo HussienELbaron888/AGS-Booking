@@ -3,13 +3,13 @@ import { PlaceHolderImages } from './placeholder-images';
 
 const generateSeats = (): SeatingChart => {
   const seatingChart: SeatingChart = { rows: [] };
-  const rowLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+  const rowLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T'];
   
-  rowLetters.forEach((rowId, rowIndex) => {
+  rowLetters.forEach((rowId) => {
     const row: SeatingRow = { id: rowId, seats: [] };
     
-    // Left section
-    for (let i = 1; i <= 4; i++) {
+    // Left section (7 seats)
+    for (let i = 1; i <= 7; i++) {
       const seat: Seat = {
         id: `${rowId}L${i}`,
         number: `${i}`,
@@ -20,11 +20,12 @@ const generateSeats = (): SeatingChart => {
       row.seats.push(seat);
     }
     
-    // Aisle
+    // Aisle (empty space)
     row.seats.push({ id: `${rowId}-aisle1`, number: '', status: 'available', type: 'aisle', section: 'aisle' });
+    row.seats.push({ id: `${rowId}-aisle2`, number: '', status: 'available', type: 'aisle', section: 'aisle' });
     
-    // Center section
-    for (let i = 1; i <= 8; i++) {
+    // Center section (12 seats)
+    for (let i = 1; i <= 12; i++) {
       const seat: Seat = {
         id: `${rowId}C${i}`,
         number: `${i}`,
@@ -35,11 +36,12 @@ const generateSeats = (): SeatingChart => {
       row.seats.push(seat);
     }
     
-    // Aisle
-    row.seats.push({ id: `${rowId}-aisle2`, number: '', status: 'available', type: 'aisle', section: 'aisle' });
+    // Aisle (empty space)
+    row.seats.push({ id: `${rowId}-aisle3`, number: '', status: 'available', type: 'aisle', section: 'aisle' });
+    row.seats.push({ id: `${rowId}-aisle4`, number: '', status: 'available', type: 'aisle', section: 'aisle' });
 
-    // Right section
-    for (let i = 1; i <= 4; i++) {
+    // Right section (7 seats)
+    for (let i = 1; i <= 7; i++) {
       const seat: Seat = {
         id: `${rowId}R${i}`,
         number: `${i}`,
@@ -55,6 +57,7 @@ const generateSeats = (): SeatingChart => {
 
   return seatingChart;
 };
+
 
 export const events: Event[] = [
   {

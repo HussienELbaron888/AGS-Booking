@@ -15,8 +15,8 @@ interface SeatingChartProps {
 
 export function SeatingChart({ seatingChart, selectedSeats, onSeatClick }: SeatingChartProps) {
   const [scale, setScale] = useState(1);
-  const seatSize = 32; // in pixels
-  const gapSize = 8; // in pixels
+  const seatSize = 28; 
+  const gapSize = 6;
   const [lang, setLang] = useState('en');
 
   useEffect(() => {
@@ -58,7 +58,10 @@ export function SeatingChart({ seatingChart, selectedSeats, onSeatClick }: Seati
             className="transition-transform duration-300 origin-center"
             style={{ transform: `scale(${scale})` }}
           >
-            <div className="flex flex-col-reverse gap-2">
+            <div className="bg-primary/80 mb-8 p-2 rounded-lg text-center font-semibold text-primary-foreground text-sm shadow-inner" style={{ width: `${chartWidth * 0.6}px`, marginLeft: 'auto', marginRight: 'auto' }}>
+              S T A G E
+            </div>
+            <div className="flex flex-col gap-2">
               {seatingChart.rows.map(row => (
                 <div key={row.id} className="flex items-center justify-center" style={{ gap: `${gapSize}px`}}>
                   <div className="w-8 text-center font-bold text-muted-foreground">{row.id}</div>
@@ -74,10 +77,6 @@ export function SeatingChart({ seatingChart, selectedSeats, onSeatClick }: Seati
                    <div className="w-8 text-center font-bold text-muted-foreground">{row.id}</div>
                 </div>
               ))}
-            </div>
-
-            <div className="bg-muted mt-8 p-2 rounded-lg text-center font-semibold text-muted-foreground text-sm shadow-inner" style={{ width: `${chartWidth}px`, marginLeft: 'auto', marginRight: 'auto' }}>
-              {lang === 'en' ? 'STAGE' : 'المسرح'}
             </div>
           </div>
         </div>
