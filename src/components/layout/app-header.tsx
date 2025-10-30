@@ -12,6 +12,7 @@ import {
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { AppTitle } from './app-title';
+import Image from 'next/image';
 
 export function AppHeader() {
   const pathname = usePathname();
@@ -35,8 +36,8 @@ export function AppHeader() {
   return (
     <header className="bg-primary text-primary-foreground shadow-md sticky top-0 z-40">
       <div className="container mx-auto flex items-center justify-between p-4">
-        <Link href="/" className="flex items-center gap-2 text-xl font-bold font-headline">
-          <Ticket className="text-accent" />
+        <Link href="/" className="flex items-center gap-3 text-xl font-bold font-headline">
+          <Image src="/white logo.png" alt="AGS Logo" width={40} height={40} className="h-10 w-auto" />
           <AppTitle />
         </Link>
         <nav className="hidden md:flex items-center gap-4">
