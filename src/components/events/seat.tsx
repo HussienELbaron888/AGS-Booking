@@ -22,23 +22,25 @@ export function Seat({ seat, isSelected, onClick, size }: SeatProps) {
     return <div style={{ width: `${size}px`, height: `${size}px` }} />;
   }
 
-  const status = isSelected ? 'selected' : seat.status;
+  const currentStatus = isSelected ? 'selected' : seat.status;
   
-  const isClickable = status === 'available' || status === 'selected';
+  const isClickable = currentStatus === 'available' || currentStatus === 'selected';
 
   return (
     <button
-      aria-label={`Seat ${seat.number}, Status: ${status}`}
-      onClick={() => onClick(seat)}
+      aria-label={`Seat ${seat.id}, Status: ${currentStatus}`}
+      onClick={() => isClickable && onClick(seat)}
       disabled={!isClickable}
       style={{ width: `${size}px`, height: `${size}px` }}
       className={cn(
         'flex items-center justify-center rounded-t-md transition-all duration-200 relative',
-        isClickable ? 'cursor-pointer' : 'cursor-not-allowed',
-        status === 'available' && 'text-card-foreground/50 hover:text-accent hover:scale-110',
-        status === 'selected' && 'text-accent scale-110 shadow-lg',
-        status === 'unavailable' && 'text-muted-foreground/30 opacity-50',
-        status === 'reserved' && 'text-muted-foreground/30 opacity-50'
+        {
+          'cursor-pointer': isClickable,
+          'cursor-not-allowed': !isClickable,
+          'text-card-foreground/50 hover:text-accent hover:scale-110': currentStatus === 'available',
+          'text-accent scale-110 shadow-lg': currentStatus === 'selected',
+          'text-muted-foreground/30 opacity-50': currentStatus === 'reserved' || currentStatus === 'unavailable',
+        }
       )}
     >
       {seatIcon}
