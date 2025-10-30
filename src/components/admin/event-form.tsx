@@ -25,14 +25,6 @@ const formSchema = z.object({
   image: z.any(),
   targetAudience: z.string().min(1, 'Target audience is required'),
   keyHighlights: z.string().min(1, 'Key highlights are required'),
-}).refine(data => {
-    // If it's an edit form (event exists), image is optional.
-    // If it's a new form (event doesn't exist), image is required.
-    // We check for files length to ensure a file is selected.
-    return data.image?.[0] || false;
-}, {
-    message: "Image is required",
-    path: ["image"],
 });
 
 const createEditSchema = (isEdit: boolean) => z.object({
