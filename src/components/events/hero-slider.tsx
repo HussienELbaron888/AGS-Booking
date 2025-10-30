@@ -82,7 +82,7 @@ export function HeroSlider({ events }: { events: Event[] }) {
                         </Button>
                          <Button asChild size="lg" variant="secondary" className="bg-accent hover:bg-accent/90 text-accent-foreground">
                            <Link href={`/events/${event.id}`}>
-                              {lang === 'en' ? 'More Info' : 'اعرف المزيد'}
+                              {lang === 'en' ? 'BOOK NOW' : 'احجز الآن'}
                            </Link>
                         </Button>
                       </div>
