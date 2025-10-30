@@ -39,7 +39,7 @@ export function AppHeader() {
     <header className="bg-primary text-primary-foreground shadow-md sticky top-0 z-40">
       <div className="container mx-auto flex items-center justify-between p-4">
         <Link href="/" className="flex items-center gap-3 text-xl font-bold font-headline">
-          <Image src="/white logo.png" alt="AGS Logo" width={80} height={80} className="h-10 w-auto" />
+          <Image src="/white logo.png" alt="AGS Logo" width={100} height={100} className="h-12 w-auto" />
           <AppTitle />
         </Link>
         <nav className="hidden md:flex items-center gap-6">
