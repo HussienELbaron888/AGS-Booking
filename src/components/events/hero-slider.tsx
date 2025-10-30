@@ -75,11 +75,6 @@ export function HeroSlider({ events }: { events: Event[] }) {
                       </p>
                       <p className="text-gray-300 mb-8">{`${event.time}, ${new Date(event.date).toLocaleDateString(lang === 'ar' ? 'ar-SA' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`}</p>
                       <div className="flex flex-col sm:flex-row gap-4">
-                        <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold">
-                           <Link href={`/events/${event.id}`}>
-                             {lang === 'en' ? 'Buy Now' : 'اشتر الآن'}
-                           </Link>
-                        </Button>
                          <Button asChild size="lg" variant="secondary" className="bg-accent hover:bg-accent/90 text-accent-foreground">
                            <Link href={`/events/${event.id}`}>
                               {lang === 'en' ? 'BOOK NOW' : 'احجز الآن'}
