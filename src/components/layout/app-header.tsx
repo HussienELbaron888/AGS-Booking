@@ -18,10 +18,15 @@ export function AppHeader() {
   const pathname = usePathname();
   const [lang, setLang] = useState('en');
 
+  // Set initial language from document, then update state
   useEffect(() => {
-    const html = document.documentElement;
-    html.lang = lang;
-    html.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    const initialLang = document.documentElement.lang || 'en';
+    setLang(initialLang);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
   }, [lang]);
 
   const toggleLang = () => {
