@@ -3,10 +3,9 @@ import { EventForm } from "@/components/admin/event-form";
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
 import { addDoc, collection } from 'firebase/firestore';
-import { db, storage } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
 import { generateSeats } from '@/lib/seats';
 import * as z from 'zod';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
 
@@ -16,7 +15,7 @@ const formSchema = z.object({
     time: z.string().min(1, 'Time is required'),
     description: z.string().min(1, 'Description is required'),
     longDescription: z.string().min(1, 'Long description is required'),
-    image: z.any().refine((files) => files?.length > 0, 'Image is required.'),
+    image: z.string().url('Must be a valid image URL').min(1, 'Image URL is required'),
     targetAudience: z.string().min(1, 'Target audience is required'),
     keyHighlights: z.string().min(1, 'Key highlights are required'),
   });
@@ -41,15 +40,8 @@ export default function NewEventPage() {
     setIsSubmitting(true);
     let eventsCollection;
     try {
-      const imageFile = values.image[0];
-      const storageRef = ref(storage, `events/${Date.now()}_${imageFile.name}`);
-      await uploadBytes(storageRef, imageFile);
-      const imageUrl = await getDownloadURL(storageRef);
-
-      const eventData = { ...values, image: imageUrl };
-      
       const newEvent = {
-        ...eventData,
+        ...values,
         seatingChart: generateSeats(),
       };
       
@@ -62,9 +54,9 @@ export default function NewEventPage() {
     } catch (error: any) {
       console.error('Error adding event: ', error);
       // Check if it's a permission error
-      if (error.code === 'permission-denied') {
+      if (eventsCollection) {
           const permissionError = new FirestorePermissionError({
-              path: eventsCollection ? eventsCollection.path : 'events',
+              path: eventsCollection.path,
               operation: 'create',
               requestResourceData: {
                   ...values,

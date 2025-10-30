@@ -16,20 +16,9 @@ import { Textarea } from '@/components/ui/textarea';
 import type { Event } from '@/lib/types';
 import Image from 'next/image';
 
-const formSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  date: z.string().min(1, 'Date is required'),
-  time: z.string().min(1, 'Time is required'),
-  description: z.string().min(1, 'Description is required'),
-  longDescription: z.string().min(1, 'Long description is required'),
-  image: z.any(),
-  targetAudience: z.string().min(1, 'Target audience is required'),
-  keyHighlights: z.string().min(1, 'Key highlights are required'),
-});
-
 interface EventFormProps {
   event?: Event;
-  onSubmit: (values: z.infer<typeof formSchema>) => void;
+  onSubmit: (values: z.infer<any>) => void;
   isSubmitting?: boolean;
   schema: z.ZodObject<any, any, any>;
 }
@@ -38,20 +27,18 @@ export function EventForm({ event, onSubmit, isSubmitting, schema }: EventFormPr
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: event
-      ? { ...event, image: undefined } // Don't load existing image URL into file input
+      ? { ...event }
       : {
           name: '',
           date: '',
           time: '',
           description: '',
           longDescription: '',
-          image: undefined,
+          image: '',
           targetAudience: '',
           keyHighlights: '',
         },
   });
-
-  const imageRef = form.register('image');
 
   return (
     <Form {...form}>
@@ -126,7 +113,7 @@ export function EventForm({ event, onSubmit, isSubmitting, schema }: EventFormPr
           name="image"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Image</FormLabel>
+              <FormLabel>Image URL</FormLabel>
               {event?.image && (
                 <div className="my-2">
                   <p className="text-sm text-muted-foreground">Current Image:</p>
@@ -134,7 +121,7 @@ export function EventForm({ event, onSubmit, isSubmitting, schema }: EventFormPr
                 </div>
               )}
               <FormControl>
-                <Input type="file" accept="image/*" {...imageRef} />
+                <Input type="url" placeholder="https://example.com/image.png" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
