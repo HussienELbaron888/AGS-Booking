@@ -39,11 +39,10 @@ export default function EditEventPage({ params }: { params: { id: string } }) {
     try {
       const eventRef = doc(db, 'events', event.id);
       await updateDoc(eventRef, values);
-      alert('Event updated successfully!');
+      alert('تم تحديث الحدث بنجاح!');
       router.push('/admin/events');
-    } catch (error) {
-      console.error('Error updating event: ', error);
-      alert('Failed to update event.');
+    } catch (error)      console.error('Error updating event: ', error);
+      alert('فشل تحديث الحدث.');
     }
   }
 
