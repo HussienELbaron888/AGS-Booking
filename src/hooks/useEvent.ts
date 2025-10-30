@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import type { Event } from '@/lib/types';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 export function useEvent(id: string) {
   const [event, setEvent] = useState<Event | null>(null);
@@ -22,8 +24,12 @@ export function useEvent(id: string) {
         setEvent(null);
       }
       setLoading(false);
-    }, (error) => {
-      console.error("Error fetching event:", error);
+    }, (serverError) => {
+      const permissionError = new FirestorePermissionError({
+        path: docRef.path,
+        operation: 'get',
+      });
+      errorEmitter.emit('permission-error', permissionError);
       setLoading(false);
     });
 

@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import * as z from 'zod';
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 const formSchema = z.object({
     name: z.string().min(1, 'Name is required'),
@@ -36,15 +38,21 @@ export default function EditEventPage({ params }: { params: { id: string } }) {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!event) return;
-    try {
-      const eventRef = doc(db, 'events', event.id);
-      await updateDoc(eventRef, values);
-      alert('تم تحديث الحدث بنجاح!');
-      router.push('/admin/events');
-    } catch (error) {
-      console.error('Error updating event: ', error);
-      alert('فشل تحديث الحدث.');
-    }
+    const eventRef = doc(db, 'events', event.id);
+    updateDoc(eventRef, values)
+      .then(() => {
+        alert('تم تحديث الحدث بنجاح!');
+        router.push('/admin/events');
+      })
+      .catch((serverError) => {
+        const permissionError = new FirestorePermissionError({
+            path: eventRef.path,
+            operation: 'update',
+            requestResourceData: values,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+        alert('فشل تحديث الحدث.');
+      });
   }
 
   if (loading) {
