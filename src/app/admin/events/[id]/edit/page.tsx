@@ -89,7 +89,7 @@ export default function EditEventPage({ params }: { params: { id: string } }) {
   return (
     <div>
       <h1 className="text-3xl font-bold mb-6">{lang === 'en' ? 'Edit Event' : 'تعديل الحدث'}</h1>
-      <EventForm event={event} onSubmit={onSubmit} isSubmitting={isSubmitting} />
+      <EventForm event={event} onSubmit={onSubmit} isSubmitting={isSubmitting} schema={formSchema}/>
     </div>
   );
 }

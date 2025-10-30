@@ -16,7 +16,7 @@ const formSchema = z.object({
     time: z.string().min(1, 'Time is required'),
     description: z.string().min(1, 'Description is required'),
     longDescription: z.string().min(1, 'Long description is required'),
-    image: z.any().refine(files => files?.length > 0, 'Image is required'),
+    image: z.any().refine((files) => files?.length > 0, 'Image is required.'),
     targetAudience: z.string().min(1, 'Target audience is required'),
     keyHighlights: z.string().min(1, 'Key highlights are required'),
   });
@@ -62,9 +62,9 @@ export default function NewEventPage() {
     } catch (error: any) {
       console.error('Error adding event: ', error);
       // Check if it's a permission error
-      if (error.code === 'permission-denied' && eventsCollection) {
+      if (error.code === 'permission-denied') {
           const permissionError = new FirestorePermissionError({
-              path: eventsCollection.path,
+              path: eventsCollection ? eventsCollection.path : 'events',
               operation: 'create',
               requestResourceData: {
                   ...values,
@@ -81,7 +81,7 @@ export default function NewEventPage() {
   return (
     <div>
       <h1 className="text-3xl font-bold mb-6">{lang === 'en' ? 'Create New Event' : 'إنشاء حدث جديد'}</h1>
-      <EventForm onSubmit={onSubmit} isSubmitting={isSubmitting} />
+      <EventForm onSubmit={onSubmit} isSubmitting={isSubmitting} schema={formSchema} />
     </div>
   );
 }

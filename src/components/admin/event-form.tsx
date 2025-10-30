@@ -27,32 +27,16 @@ const formSchema = z.object({
   keyHighlights: z.string().min(1, 'Key highlights are required'),
 });
 
-const createEditSchema = (isEdit: boolean) => z.object({
-  name: z.string().min(1, 'Name is required'),
-  date: z.string().min(1, 'Date is required'),
-  time: z.string().min(1, 'Time is required'),
-  description: z.string().min(1, 'Description is required'),
-  longDescription: z.string().min(1, 'Long description is required'),
-  image: z.any().optional(),
-  targetAudience: z.string().min(1, 'Target audience is required'),
-  keyHighlights: z.string().min(1, 'Key highlights are required'),
-}).refine(data => {
-    if (isEdit) return true; // Image is not required for edit
-    return data.image?.length > 0;
-}, {
-    message: 'Image is required',
-    path: ['image'],
-});
-
 interface EventFormProps {
   event?: Event;
   onSubmit: (values: z.infer<typeof formSchema>) => void;
   isSubmitting?: boolean;
+  schema: z.ZodObject<any, any, any>;
 }
 
-export function EventForm({ event, onSubmit, isSubmitting }: EventFormProps) {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(createEditSchema(!!event)),
+export function EventForm({ event, onSubmit, isSubmitting, schema }: EventFormProps) {
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
     defaultValues: event
       ? { ...event, image: undefined } // Don't load existing image URL into file input
       : {
