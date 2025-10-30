@@ -29,20 +29,32 @@ export default function EventPage({ params }: EventPageProps) {
     observer.observe(html, { attributes: true, attributeFilter: ['lang'] });
     setLang(html.lang || 'en'); // Initial set
 
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
     const fetchEvent = async () => {
-      const docRef = doc(db, 'events', id);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        setEvent({ id: docSnap.id, ...docSnap.data() } as Event);
-      } else {
-        notFound();
+      if (!id) {
+        setLoading(false);
+        return;
       }
-      setLoading(false);
+      try {
+        const docRef = doc(db, 'events', id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setEvent({ id: docSnap.id, ...docSnap.data() } as Event);
+        } else {
+          notFound();
+        }
+      } catch (error) {
+        console.error("Error fetching event:", error);
+        notFound();
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchEvent();
-
-    return () => observer.disconnect();
   }, [id]);
 
   if (loading) {
