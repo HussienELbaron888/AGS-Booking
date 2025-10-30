@@ -1,0 +1,16 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Allow read access to everyone for all files
+    match /{allPaths=**} {
+      allow read;
+    }
+
+    // Allow write access only to authenticated users
+    // And only for files smaller than 5MB
+    match /events/{fileName} {
+       allow write: if request.auth != null && request.resource.size < 5 * 1024 * 1024;
+    }
+  }
+}

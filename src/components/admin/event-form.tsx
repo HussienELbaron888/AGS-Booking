@@ -14,6 +14,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import type { Event } from '@/lib/types';
+import Image from 'next/image';
 
 const formSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -21,7 +22,10 @@ const formSchema = z.object({
   time: z.string().min(1, 'Time is required'),
   description: z.string().min(1, 'Description is required'),
   longDescription: z.string().min(1, 'Long description is required'),
-  image: z.string().min(1, 'Image URL is required'),
+  image: z.any().refine(
+    (files) => files instanceof FileList ? files.length > 0 : true,
+    'Image is required'
+  ),
   targetAudience: z.string().min(1, 'Target audience is required'),
   keyHighlights: z.string().min(1, 'Key highlights are required'),
 });
@@ -29,22 +33,27 @@ const formSchema = z.object({
 interface EventFormProps {
   event?: Event;
   onSubmit: (values: z.infer<typeof formSchema>) => void;
+  isSubmitting?: boolean;
 }
 
-export function EventForm({ event, onSubmit }: EventFormProps) {
+export function EventForm({ event, onSubmit, isSubmitting }: EventFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: event || {
-      name: '',
-      date: '',
-      time: '',
-      description: '',
-      longDescription: '',
-      image: '',
-      targetAudience: '',
-      keyHighlights: '',
-    },
+    defaultValues: event
+      ? { ...event, image: undefined } // Don't load existing image URL into file input
+      : {
+          name: '',
+          date: '',
+          time: '',
+          description: '',
+          longDescription: '',
+          image: undefined,
+          targetAudience: '',
+          keyHighlights: '',
+        },
   });
+
+  const imageRef = form.register('image');
 
   return (
     <Form {...form}>
@@ -119,9 +128,15 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
           name="image"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Image URL</FormLabel>
+              <FormLabel>Image</FormLabel>
+              {event?.image && (
+                <div className="my-2">
+                  <p className="text-sm text-muted-foreground">Current Image:</p>
+                  <Image src={event.image} alt="Current event image" width={200} height={100} className="rounded-md object-cover" />
+                </div>
+              )}
               <FormControl>
-                <Input placeholder="https://example.com/image.png" {...field} />
+                <Input type="file" accept="image/*" {...imageRef} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -153,7 +168,9 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
             </FormItem>
           )}
         />
-        <Button type="submit">{event ? 'Update' : 'Create'} Event</Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Saving...' : event ? 'Update Event' : 'Create Event'}
+        </Button>
       </form>
     </Form>
   );
