@@ -16,7 +16,7 @@ const formSchema = z.object({
     time: z.string().min(1, 'Time is required'),
     description: z.string().min(1, 'Description is required'),
     longDescription: z.string().min(1, 'Long description is required'),
-    image: z.any().optional(), // Image is optional on edit
+    image: z.any().optional(),
     targetAudience: z.string().min(1, 'Target audience is required'),
     keyHighlights: z.string().min(1, 'Key highlights are required'),
 });
