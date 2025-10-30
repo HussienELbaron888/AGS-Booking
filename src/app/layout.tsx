@@ -3,6 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { AppHeader } from "@/components/layout/app-header";
 import { FirebaseProvider } from '@/firebase/provider';
+import { AppFooter } from '@/components/layout/app-footer';
 
 export const metadata: Metadata = {
   title: 'AGS Booking',
@@ -25,6 +26,7 @@ export default function RootLayout({
         <FirebaseProvider>
           <AppHeader />
           <main className="flex-grow">{children}</main>
+          <AppFooter />
           <Toaster />
         </FirebaseProvider>
       </body>

@@ -19,6 +19,9 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
+  const sliderEvents = events.slice(0, 5);
+  const upcomingEvents = events.slice(5);
+
   return (
     <div dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       {loading ? (
@@ -27,15 +30,27 @@ export default function Home() {
         </div>
       ) : (
         <>
-          <HeroSlider events={events} />
+          <HeroSlider events={sliderEvents} />
           <div className="container mx-auto py-8 px-4">
             <h1 className="text-3xl md:text-4xl font-bold font-headline text-primary mb-2 mt-8">
-              {lang === 'en' ? 'Upcoming Events' : 'الأحداث القادمة'}
+              {lang === 'en' ? 'Current Events' : 'الفعاليات الحالية'}
             </h1>
             <p className="text-muted-foreground mb-8">
               {lang === 'en' ? 'Book your seats for our exciting school events.' : 'احجز مقعدك لأحداثنا المدرسية المثيرة.'}
             </p>
-            <EventList events={events} />
+            <EventList events={sliderEvents} />
+
+            {upcomingEvents.length > 0 && (
+              <>
+                <h2 className="text-3xl md:text-4xl font-bold font-headline text-primary mb-2 mt-16">
+                  {lang === 'en' ? 'Upcoming Events' : 'الأحداث القادمة'}
+                </h2>
+                <p className="text-muted-foreground mb-8">
+                  {lang === 'en' ? 'Stay tuned for more exciting events.' : 'ترقبوا المزيد من الفعاليات المثيرة.'}
+                </p>
+                <EventList events={upcomingEvents} />
+              </>
+            )}
           </div>
         </>
       )}
