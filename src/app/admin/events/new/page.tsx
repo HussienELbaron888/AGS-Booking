@@ -35,10 +35,11 @@ export default function NewEventPage() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      await addDoc(collection(db, 'events'), {
+      const newEvent = {
         ...values,
         seatingChart: generateSeats(),
-      });
+      };
+      await addDoc(collection(db, 'events'), newEvent);
       alert('Event added successfully!');
       router.push('/admin/events');
     } catch (error) {
