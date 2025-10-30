@@ -1,6 +1,6 @@
 'use client';
 import Image from 'next/image';
-import { notFound } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
 import { Calendar, Clock, Info, Users } from 'lucide-react';
 import { SeatingChartWrapper } from '@/components/events/seating-chart-wrapper';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -13,16 +13,15 @@ import { FirestorePermissionError } from '@/firebase/errors';
 import React from 'react';
 
 interface EventPageProps {
-  params: {
-    id: string;
-  };
+  // params are no longer passed as a prop, but obtained via useParams hook
 }
 
-export default function EventPage({ params }: EventPageProps) {
+export default function EventPage({}: EventPageProps) {
   const [lang, setLang] = useState('en');
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
-  const { id } = params;
+  const params = useParams();
+  const id = params.id as string;
 
   useEffect(() => {
     setLang(document.documentElement.lang || 'en');
