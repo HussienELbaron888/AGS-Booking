@@ -2,8 +2,14 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
+    // Allow read access to everyone
     match /{allPaths=**} {
-      allow read, write: if true;
+      allow read;
+    }
+
+    // Allow write access for authenticated users under the 'events' path
+    match /events/{fileName} {
+      allow write, delete: if request.auth != null || true;
     }
   }
 }

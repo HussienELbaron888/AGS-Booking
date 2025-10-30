@@ -1,6 +1,6 @@
 'use client';
 import Link from "next/link"
-
+import { useState, useTransition, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -20,10 +20,25 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { MoreHorizontal, Pencil, Trash2, Eye } from "lucide-react"
 import type { Event } from "@/lib/types"
-import { useEffect, useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { doc, deleteDoc } from "firebase/firestore";
+import { ref, deleteObject } from "firebase/storage";
+import { db, storage } from "@/lib/firebase";
 
 export function EventsDataTable({ data }: { data: Event[] }) {
   const [lang, setLang] = useState('en');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   useEffect(() => {
     const html = document.documentElement;
@@ -36,7 +51,44 @@ export function EventsDataTable({ data }: { data: Event[] }) {
     return () => observer.disconnect();
   }, []);
 
+  const handleDelete = async () => {
+    if (!selectedEvent) return;
+    setIsDeleting(true);
+
+    try {
+      // Delete image from storage
+      if (selectedEvent.image) {
+        const imageRef = ref(storage, selectedEvent.image);
+        await deleteObject(imageRef).catch(error => {
+          // It's okay if the image doesn't exist, we can still delete the doc
+          if (error.code !== 'storage/object-not-found') {
+            throw error;
+          }
+        });
+      }
+
+      // Delete document from firestore
+      await deleteDoc(doc(db, "events", selectedEvent.id));
+
+      alert('Event deleted successfully!');
+    } catch (error) {
+      console.error("Error deleting event: ", error);
+      alert('Failed to delete event.');
+    } finally {
+      setIsDeleting(false);
+      setIsAlertOpen(false);
+      setSelectedEvent(null);
+    }
+  };
+
+  const openDeleteDialog = (event: Event) => {
+    setSelectedEvent(event);
+    setIsAlertOpen(true);
+  };
+
+
   return (
+    <>
     <div className="rounded-md border bg-card">
       <Table>
         <TableHeader>
@@ -77,7 +129,10 @@ export function EventsDataTable({ data }: { data: Event[] }) {
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10">
+                      <DropdownMenuItem 
+                        className="text-destructive focus:text-destructive focus:bg-destructive/10"
+                        onClick={() => openDeleteDialog(event)}
+                      >
                         <Trash2 className="mr-2 h-4 w-4 rtl:ml-2 rtl:mr-0" />
                         {lang === 'en' ? 'Delete' : 'حذف'}
                       </DropdownMenuItem>
@@ -96,5 +151,22 @@ export function EventsDataTable({ data }: { data: Event[] }) {
         </TableBody>
       </Table>
     </div>
+    <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+        <AlertDialogContent dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{lang === 'en' ? 'Are you sure?' : 'هل أنت متأكد؟'}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {lang === 'en' ? "This action cannot be undone. This will permanently delete the event and its data from our servers." : "لا يمكن التراجع عن هذا الإجراء. سيؤدي هذا إلى حذف الحدث وبياناته بشكل دائم من خوادمنا."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setSelectedEvent(null)}>{lang === 'en' ? 'Cancel' : 'إلغاء'}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} disabled={isDeleting}>
+              {isDeleting ? (lang === 'en' ? 'Deleting...' : '...جاري الحذف') : (lang === 'en' ? 'Delete' : 'حذف')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   )
 }
