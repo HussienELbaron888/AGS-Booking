@@ -53,25 +53,26 @@ export default function NewEventPage() {
       };
       
       const eventsCollection = collection(db, 'events');
-      addDoc(eventsCollection, newEvent)
-        .then(() => {
-            alert('Event added successfully!');
-            router.push('/admin/events');
-        })
-        .catch((serverError) => {
-            const permissionError = new FirestorePermissionError({
-                path: eventsCollection.path,
-                operation: 'create',
-                requestResourceData: newEvent,
-            });
-            errorEmitter.emit('permission-error', permissionError);
-            alert('Failed to add event.');
-            setIsSubmitting(false);
-        });
+      await addDoc(eventsCollection, newEvent);
+      
+      alert('Event added successfully!');
+      router.push('/admin/events');
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding event: ', error);
-      alert('Failed to add event.');
+      // Check if it's a permission error
+      if (error.code === 'permission-denied') {
+          const permissionError = new FirestorePermissionError({
+              path: 'events', // collection path
+              operation: 'create',
+              requestResourceData: {
+                  ...values,
+                  seatingChart: 'Generated Seating Chart' // Avoid sending the whole object
+              },
+          });
+          errorEmitter.emit('permission-error', permissionError);
+      }
+      alert('Failed to add event. Please check permissions and try again.');
       setIsSubmitting(false);
     }
   }
