@@ -6,10 +6,10 @@ export function AppFooter() {
     <footer className="bg-primary text-primary-foreground py-8 mt-16">
       <div className="container mx-auto flex justify-center items-center">
         <Image
-          src="/ags-logo.png"
+          src="/white logo.png"
           alt="Advanced Generations International Schools Logo"
-          width={250}
-          height={100}
+          width={150}
+          height={60}
           className="object-contain"
         />
       </div>
