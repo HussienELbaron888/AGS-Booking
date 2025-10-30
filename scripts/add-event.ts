@@ -28,17 +28,6 @@ const generateSeats = (): SeatingChart => {
 
     // Center section (8 seats)
     for (let i = 1; i <= 8; i++) {
-      // Skip seats in the first row of Section C
-      if (rowIndex === 0) {
-        row.seats.push({
-          id: `${rowId}C${i}`,
-          number: '',
-          status: 'available',
-          type: 'empty',
-          section: 'center',
-        });
-        continue;
-      }
       const seat: Seat = {
         id: `${rowId}C${i}`,
         number: `${i}`,
