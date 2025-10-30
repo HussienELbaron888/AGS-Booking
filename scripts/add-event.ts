@@ -16,7 +16,7 @@ const generateSeats = (): SeatingChart => {
       const seat: Seat = {
         id: `${rowId}L${i}`,
         number: `${i}`,
-        status: Math.random() > 0.3 ? 'available' : 'unavailable',
+        status: 'available',
         type: 'seat',
         section: 'left',
       };
@@ -42,7 +42,7 @@ const generateSeats = (): SeatingChart => {
       const seat: Seat = {
         id: `${rowId}C${i}`,
         number: `${i}`,
-        status: Math.random() > 0.3 ? 'available' : 'unavailable',
+        status: 'available',
         type: 'seat',
         section: 'center',
       };
@@ -57,7 +57,7 @@ const generateSeats = (): SeatingChart => {
       const seat: Seat = {
         id: `${rowId}R${i}`,
         number: `${i}`,
-        status: Math.random() > 0.3 ? 'available' : 'unavailable',
+        status: 'available',
         type: 'seat',
         section: 'right',
       };
