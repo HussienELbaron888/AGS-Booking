@@ -1,6 +1,6 @@
 
 import { db } from '../src/lib/firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, doc, writeBatch } from 'firebase/firestore';
 import { Event, SeatingChart, SeatingRow, Seat } from '../src/lib/types';
 import { PlaceHolderImages } from '../src/lib/placeholder-images';
 
@@ -80,4 +80,39 @@ const addEvent = async () => {
   }
 };
 
-addEvent();
+const resetAllSeats = async () => {
+    console.log('Fetching all events to reset seat statuses...');
+    const eventsCollection = collection(db, 'events');
+    const eventsSnapshot = await getDocs(eventsCollection);
+    const batch = writeBatch(db);
+  
+    eventsSnapshot.forEach((eventDoc) => {
+      console.log(`Processing event: ${eventDoc.id}`);
+      const eventData = eventDoc.data() as Event;
+      const seatingChart = eventData.seatingChart;
+  
+      if (seatingChart && seatingChart.rows) {
+        seatingChart.rows.forEach(row => {
+          row.seats.forEach(seat => {
+            if (seat.status !== 'available') {
+                seat.status = 'available';
+            }
+          });
+        });
+  
+        const eventRef = doc(db, 'events', eventDoc.id);
+        batch.update(eventRef, { seatingChart: seatingChart });
+        console.log(`- Queued update for event ${eventDoc.id}`);
+      }
+    });
+  
+    try {
+      await batch.commit();
+      console.log('Successfully reset all seat statuses across all events.');
+    } catch (error) {
+      console.error('Error committing batch update for seat reset:', error);
+    }
+  };
+
+// addEvent();
+resetAllSeats();
