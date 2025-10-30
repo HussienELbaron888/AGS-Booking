@@ -47,7 +47,7 @@ export function AppHeader() {
             <Link
               key={link.href}
               href={link.href}
-              className={`flex items-center gap-2 text-sm font-medium transition-colors hover:text-accent ${
+              className={`flex items-center gap-2 font-bold text-base transition-colors hover:text-accent ${
                 pathname === link.href ? 'text-accent' : 'text-primary-foreground'
               }`}
             >

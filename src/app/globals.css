@@ -16,7 +16,7 @@
     --secondary-foreground: 224 57% 22%;
     --muted: 210 100% 90%;
     --muted-foreground: 224 57% 35%;
-    --accent: 47 90% 44%; /* #D4AC0D */
+    --accent: 47 90% 55%; /* Lighter Yellow */
     --accent-foreground: 224 57% 15%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
@@ -40,13 +40,13 @@
   }
 
   html[lang="en"] {
-    --font-body: 'Poppins';
-    --font-headline: 'Poppins';
+    --font-body: 'Poppins', sans-serif;
+    --font-headline: 'Poppins', sans-serif;
   }
 
   html[lang="ar"] {
-    --font-body: 'Tajawal';
-    --font-headline: 'Tajawal';
+    --font-body: 'Tajawal', sans-serif;
+    --font-headline: 'Tajawal', sans-serif;
   }
 
   .dark {
@@ -62,7 +62,7 @@
     --secondary-foreground: 210 100% 98%;
     --muted: 224 30% 15%;
     --muted-foreground: 210 100% 85%;
-    --accent: 47 90% 44%;
+    --accent: 47 90% 55%; /* Lighter Yellow */
     --accent-foreground: 224 57% 15%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
