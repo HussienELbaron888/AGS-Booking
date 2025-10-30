@@ -56,15 +56,20 @@ export function EventsDataTable({ data }: { data: Event[] }) {
     setIsDeleting(true);
 
     try {
-      // Delete image from storage
-      if (selectedEvent.image) {
-        const imageRef = ref(storage, selectedEvent.image);
-        await deleteObject(imageRef).catch(error => {
+      // Check if the image URL is a Firebase Storage URL before trying to delete
+      const isFirebaseStorageUrl = selectedEvent.image.startsWith('gs://') || selectedEvent.image.includes('firebasestorage.googleapis.com');
+      
+      if (selectedEvent.image && isFirebaseStorageUrl) {
+        try {
+          const imageRef = ref(storage, selectedEvent.image);
+          await deleteObject(imageRef);
+        } catch (error: any) {
           // It's okay if the image doesn't exist, we can still delete the doc
           if (error.code !== 'storage/object-not-found') {
-            throw error;
+            // But if it's another error, we should probably log it.
+            console.warn("Could not delete image from storage:", error);
           }
-        });
+        }
       }
 
       // Delete document from firestore
