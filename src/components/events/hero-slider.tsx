@@ -75,12 +75,12 @@ export function HeroSlider({ events }: { events: Event[] }) {
                       </p>
                       <p className="text-gray-300 mb-8">{`${event.time}, ${new Date(event.date).toLocaleDateString(lang === 'ar' ? 'ar-SA' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`}</p>
                       <div className="flex flex-col sm:flex-row gap-4">
-                        <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700 text-white font-bold">
+                        <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold">
                            <Link href={`/events/${event.id}`}>
                              {lang === 'en' ? 'Buy Now' : 'اشتر الآن'}
                            </Link>
                         </Button>
-                         <Button asChild size="lg" variant="outline" className="border-white/50 text-white hover:bg-white/10 hover:text-white">
+                         <Button asChild size="lg" variant="secondary" className="bg-accent hover:bg-accent/90 text-accent-foreground">
                            <Link href={`/events/${event.id}`}>
                               {lang === 'en' ? 'More Info' : 'اعرف المزيد'}
                            </Link>
@@ -104,7 +104,7 @@ export function HeroSlider({ events }: { events: Event[] }) {
                 className={cn(
                   "group relative w-full h-24 rounded-md overflow-hidden text-white text-start p-2 transition-all duration-300",
                   "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-blue-500",
-                  index === current ? "border-2 border-blue-500" : "opacity-60 hover:opacity-100"
+                  index === current ? "border-2 border-accent" : "opacity-60 hover:opacity-100"
                 )}
               >
                 <Image
@@ -115,7 +115,7 @@ export function HeroSlider({ events }: { events: Event[] }) {
                 />
                 <div className="absolute inset-0 bg-black/50 group-hover:bg-black/30 transition-colors"></div>
                 <div className="relative z-10">
-                  <p className="text-xs font-bold uppercase tracking-wider text-blue-400">
+                  <p className="text-xs font-bold uppercase tracking-wider text-accent/80">
                     {lang === 'en' ? 'Upcoming Event' : 'فعالية قادمة'}
                   </p>
                   <p className="font-semibold text-sm line-clamp-2">{event.name}</p>
