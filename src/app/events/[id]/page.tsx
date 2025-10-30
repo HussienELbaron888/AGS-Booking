@@ -6,8 +6,10 @@ import { SeatingChartWrapper } from '@/components/events/seating-chart-wrapper';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useEffect, useState } from 'react';
 import type { Event } from '@/lib/types';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 interface EventPageProps {
   params: {
@@ -33,28 +35,34 @@ export default function EventPage({ params }: EventPageProps) {
   }, []);
 
   useEffect(() => {
-    const fetchEvent = async () => {
-      if (!id) {
-        setLoading(false);
-        return;
-      }
-      try {
-        const docRef = doc(db, 'events', id);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setEvent({ id: docSnap.id, ...docSnap.data() } as Event);
-        } else {
-          notFound();
-        }
-      } catch (error) {
-        console.error("Error fetching event:", error);
+    if (!id) {
+      setLoading(false);
+      return;
+    }
+    
+    const docRef = doc(db, 'events', id);
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setEvent({ id: docSnap.id, ...docSnap.data() } as Event);
+      } else {
+        setEvent(null);
         notFound();
-      } finally {
-        setLoading(false);
       }
-    };
+      setLoading(false);
+    }, (serverError) => {
+      const permissionError = new FirestorePermissionError({
+        path: docRef.path,
+        operation: 'get',
+      });
+      errorEmitter.emit('permission-error', permissionError);
+      setLoading(false);
+      // We can show a generic error to the user, the detailed one is in the console
+      // for development. Or we could choose to show notFound().
+      // For now, let's just indicate an error state.
+      setEvent(null); 
+    });
 
-    fetchEvent();
+    return () => unsubscribe();
   }, [id]);
 
   if (loading) {
@@ -62,7 +70,9 @@ export default function EventPage({ params }: EventPageProps) {
   }
 
   if (!event) {
-    return notFound();
+    // This can happen if the event is not found or if there's a permission error.
+    // The console will have the detailed error for developers.
+    return <div>Event not found or access denied.</div>;
   }
 
   const imagePlaceholder = PlaceHolderImages.find(p => p.imageUrl === event.image);
