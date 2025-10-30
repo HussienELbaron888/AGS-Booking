@@ -93,7 +93,7 @@ const generateSeats = () => {
     time: '19:00',
     description: 'A special theatrical performance produced and performed by the school\'s students. An inspiring story about achieving dreams.',
     longDescription: 'A special theatrical performance produced and performed by the school\'s students. An inspiring story about achieving dreams. This event showcases the creativity and talent of our students, and we invite you to come and support them.',
-    image: placeholderImages.placeholderImages.find(p => p.id === 'event-4')?.imageUrl || '',
+    image: placeholderImages.placeholderImages.find(p => p.id === 'event-4')?.imageUrl || 'https://images.unsplash.com/photo-1504387104258-b7d3972146e2?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     seatingChart: generateSeats(),
     targetAudience: 'All students, parents, and staff',
     keyHighlights: 'Student-led production, inspiring storyline, creative performances',
