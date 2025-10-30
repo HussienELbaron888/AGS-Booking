@@ -38,6 +38,17 @@
     --sidebar-border: 224 57% 25%;
     --sidebar-ring: 47 90% 50%;
   }
+
+  html[lang="en"] {
+    --font-body: 'Poppins';
+    --font-headline: 'Poppins';
+  }
+
+  html[lang="ar"] {
+    --font-body: 'Tajawal';
+    --font-headline: 'Tajawal';
+  }
+
   .dark {
     --background: 224 30% 10%;
     --foreground: 210 100% 96%;
