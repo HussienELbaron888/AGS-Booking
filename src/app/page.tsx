@@ -23,7 +23,7 @@ export default function Home() {
     <div>
       {loading ? (
         <div className="flex justify-center items-center h-screen">
-          <p>Loading...</p>
+          <p>{lang === 'en' ? 'Loading events...' : 'جاري تحميل الأحداث ...'}</p>
         </div>
       ) : (
         <>

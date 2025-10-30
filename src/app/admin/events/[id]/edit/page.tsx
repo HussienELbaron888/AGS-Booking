@@ -41,17 +41,18 @@ export default function EditEventPage({ params }: { params: { id: string } }) {
       await updateDoc(eventRef, values);
       alert('تم تحديث الحدث بنجاح!');
       router.push('/admin/events');
-    } catch (error)      console.error('Error updating event: ', error);
+    } catch (error) {
+      console.error('Error updating event: ', error);
       alert('فشل تحديث الحدث.');
     }
   }
 
   if (loading) {
-    return <div>Loading...</div>
+    return <div>{lang === 'en' ? 'Loading...' : '...جاري التحميل'}</div>
   }
 
   if (!event) {
-    return <div>Event not found</div>
+    return <div>{lang === 'en' ? 'Event not found' : 'لم يتم العثور على الحدث'}</div>
   }
 
   return (
