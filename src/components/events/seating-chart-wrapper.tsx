@@ -6,6 +6,10 @@ import { SeatingChart } from './seating-chart';
 import { Button } from '@/components/ui/button';
 import { Ticket, X, CheckCircle, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { doc, runTransaction } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 interface SeatingChartWrapperProps {
   event: Event;
@@ -13,7 +17,8 @@ interface SeatingChartWrapperProps {
 
 export function SeatingChartWrapper({ event }: SeatingChartWrapperProps) {
   const [selectedSeats, setSelectedSeats] = useState<Seat[]>([]);
-  const [bookingStatus, setBookingStatus] = useState<'idle' | 'booked'>('idle');
+  const [bookingStatus, setBookingStatus] = useState<'idle' | 'booked' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
   const [isPending, startTransition] = useTransition();
   const [lang, setLang] = useState('en');
 
@@ -31,7 +36,7 @@ export function SeatingChartWrapper({ event }: SeatingChartWrapperProps) {
   }, []);
 
   const handleSeatClick = (seat: Seat) => {
-    if (seat.status === 'unavailable' || seat.status === 'reserved') return;
+    if (seat.status !== 'available') return;
 
     setSelectedSeats(prev => {
       const isSelected = prev.some(s => s.id === seat.id);
@@ -43,18 +48,68 @@ export function SeatingChartWrapper({ event }: SeatingChartWrapperProps) {
     });
   };
 
-  const handleBooking = () => {
-    startTransition(() => {
-        // Simulate network latency
-        setTimeout(() => {
-            setBookingStatus('booked');
-        }, 1000)
+  const handleBooking = async () => {
+    if (selectedSeats.length === 0) return;
+  
+    startTransition(async () => {
+      const eventRef = doc(db, 'events', event.id);
+      try {
+        await runTransaction(db, async (transaction) => {
+          const eventDoc = await transaction.get(eventRef);
+          if (!eventDoc.exists()) {
+            throw "Event does not exist!";
+          }
+  
+          const currentEventData = eventDoc.data() as Event;
+          const newSeatingChart = { ...currentEventData.seatingChart };
+          let canBook = true;
+          
+          for (const selectedSeat of selectedSeats) {
+            let seatFound = false;
+            for (const row of newSeatingChart.rows) {
+              const seatIndex = row.seats.findIndex(s => s.id === selectedSeat.id);
+              if (seatIndex !== -1) {
+                seatFound = true;
+                if (row.seats[seatIndex].status !== 'available') {
+                  canBook = false;
+                  setErrorMessage(`Seat ${selectedSeat.id} is no longer available.`);
+                  break;
+                }
+                row.seats[seatIndex].status = 'reserved';
+              }
+            }
+            if (!canBook || !seatFound) break;
+          }
+  
+          if (canBook) {
+            transaction.update(eventRef, { seatingChart: newSeatingChart });
+          } else {
+            // No need to throw an error here, just prevents the transaction from committing.
+            return Promise.reject(new Error(errorMessage || "One or more seats are no longer available."));
+          }
+        });
+        setBookingStatus('booked');
+      } catch (serverError: any) {
+        console.error("Booking failed: ", serverError);
+        setBookingStatus('error');
+        if (!errorMessage) {
+          setErrorMessage(serverError.message || "An unexpected error occurred during booking.");
+        }
+        const permissionError = new FirestorePermissionError({
+          path: eventRef.path,
+          operation: 'update',
+          requestResourceData: { selectedSeats: selectedSeats.map(s => s.id) },
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      }
     });
   };
   
+
   const handleReset = () => {
     setSelectedSeats([]);
     setBookingStatus('idle');
+    setErrorMessage('');
   }
 
   if (bookingStatus === 'booked') {
@@ -83,7 +138,17 @@ export function SeatingChartWrapper({ event }: SeatingChartWrapperProps) {
         onSeatClick={handleSeatClick}
       />
       
-      {selectedSeats.length > 0 && (
+      {bookingStatus === 'error' && (
+        <Alert variant="destructive" className="mt-4">
+            <AlertTitle>Booking Failed</AlertTitle>
+            <AlertDescription>
+                {errorMessage}
+                <Button onClick={handleReset} variant="link" className="p-0 h-auto mt-2">Try again</Button>
+            </AlertDescription>
+        </Alert>
+      )}
+
+      {selectedSeats.length > 0 && bookingStatus === 'idle' && (
           <div className="mt-6 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-5" data-state="open">
             <Alert dir={lang === 'ar' ? 'rtl' : 'ltr'}>
               <Ticket className="h-4 w-4" />

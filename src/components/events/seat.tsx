@@ -24,27 +24,27 @@ export function Seat({ seat, isSelected, onClick, size }: SeatProps) {
 
   const currentStatus = isSelected ? 'selected' : seat.status;
   
-  const isClickable = currentStatus === 'available' || currentStatus === 'selected';
+  const isClickable = seat.status === 'available';
 
   return (
     <button
       aria-label={`Seat ${seat.id}, Status: ${currentStatus}`}
       onClick={() => isClickable && onClick(seat)}
-      disabled={!isClickable}
+      disabled={!isClickable && !isSelected}
       style={{ width: `${size}px`, height: `${size}px` }}
       className={cn(
         'flex items-center justify-center rounded-t-md transition-all duration-200 relative',
         {
-          'cursor-pointer': isClickable,
-          'cursor-not-allowed': !isClickable,
-          'text-card-foreground/50 hover:text-accent hover:scale-110': currentStatus === 'available',
-          'text-accent scale-110 shadow-lg': currentStatus === 'selected',
-          'text-muted-foreground/30 opacity-50': currentStatus === 'reserved' || currentStatus === 'unavailable',
+          'cursor-pointer': isClickable || isSelected,
+          'cursor-not-allowed': !isClickable && !isSelected,
+          'text-card-foreground/50 hover:text-accent hover:scale-110': seat.status === 'available',
+          'text-accent scale-110 shadow-lg': isSelected,
+          'text-muted-foreground/30 opacity-50': seat.status === 'reserved' || seat.status === 'unavailable',
         }
       )}
     >
       {seatIcon}
-      <span className={cn(
+       <span className={cn(
         "absolute text-background font-bold text-[8px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 mt-[-2px]"
         )}>
         {seat.number}

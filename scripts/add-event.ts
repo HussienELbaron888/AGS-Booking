@@ -89,21 +89,12 @@ const resetAllSeats = async () => {
     eventsSnapshot.forEach((eventDoc) => {
       console.log(`Processing event: ${eventDoc.id}`);
       const eventData = eventDoc.data() as Event;
-      const seatingChart = eventData.seatingChart;
+      
+      const newSeatingChart = generateSeats(); // Generate a completely fresh seating chart
   
-      if (seatingChart && seatingChart.rows) {
-        seatingChart.rows.forEach(row => {
-          row.seats.forEach(seat => {
-            if (seat.status !== 'available') {
-                seat.status = 'available';
-            }
-          });
-        });
-  
-        const eventRef = doc(db, 'events', eventDoc.id);
-        batch.update(eventRef, { seatingChart: seatingChart });
-        console.log(`- Queued update for event ${eventDoc.id}`);
-      }
+      const eventRef = doc(db, 'events', eventDoc.id);
+      batch.update(eventRef, { seatingChart: newSeatingChart });
+      console.log(`- Queued reset for event ${eventDoc.id}`);
     });
   
     try {
@@ -114,5 +105,8 @@ const resetAllSeats = async () => {
     }
   };
 
+// To add a new event, uncomment the line below
 // addEvent();
-resetAllSeats();
+
+// To reset all seats in all existing events, uncomment the line below
+// resetAllSeats();
