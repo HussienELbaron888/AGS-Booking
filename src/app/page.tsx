@@ -20,7 +20,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div>
+    <div dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       {loading ? (
         <div className="flex justify-center items-center h-screen">
           <p>{lang === 'en' ? 'Loading events...' : 'جاري تحميل الأحداث ...'}</p>
