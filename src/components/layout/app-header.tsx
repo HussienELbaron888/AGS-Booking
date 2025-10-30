@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Languages, Ticket, User } from 'lucide-react';
+import { Languages, CalendarDays, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -30,6 +30,7 @@ export function AppHeader() {
 
   const navLinks = [
     { href: '/', label: lang === 'en' ? 'Events' : 'الأحداث' },
+    { href: '/calendar', label: lang === 'en' ? 'Calendar' : 'التقويم', icon: CalendarDays },
     { href: '/admin', label: lang === 'en' ? 'Admin' : 'الإدارة' },
   ];
 
@@ -40,15 +41,16 @@ export function AppHeader() {
           <Image src="/white logo.png" alt="AGS Logo" width={80} height={80} className="h-10 w-auto" />
           <AppTitle />
         </Link>
-        <nav className="hidden md:flex items-center gap-4">
+        <nav className="hidden md:flex items-center gap-6">
           {navLinks.map(link => (
             <Link
               key={link.href}
               href={link.href}
-              className={`text-sm font-medium transition-colors hover:text-accent ${
+              className={`flex items-center gap-2 text-sm font-medium transition-colors hover:text-accent ${
                 pathname === link.href ? 'text-accent' : 'text-primary-foreground'
               }`}
             >
+              {link.icon && <link.icon className="h-4 w-4" />}
               {link.label}
             </Link>
           ))}
