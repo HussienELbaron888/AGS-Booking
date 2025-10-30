@@ -11,16 +11,16 @@ export function AdminSidebar() {
   const [lang, setLang] = useState('en');
 
   useEffect(() => {
-    const html = document.documentElement;
-    if (html) {
-      const observer = new MutationObserver(() => {
-        setLang(html.lang || 'en');
+    setLang(document.documentElement.lang || 'en');
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'lang') {
+          setLang(document.documentElement.lang || 'en');
+        }
       });
-      observer.observe(html, { attributes: true, attributeFilter: ['lang'] });
-      setLang(html.lang || 'en'); // Initial set
-
-      return () => observer.disconnect();
-    }
+    });
+    observer.observe(document.documentElement, { attributes: true });
+    return () => observer.disconnect();
   }, []);
 
   const navItems = [

@@ -17,17 +17,20 @@ import Image from 'next/image';
 export function AppHeader() {
   const pathname = usePathname();
   const [lang, setLang] = useState('en');
+  const [isClient, setIsClient] = useState(false);
 
-  // Set initial language from document, then update state
   useEffect(() => {
+    setIsClient(true);
     const initialLang = document.documentElement.lang || 'en';
     setLang(initialLang);
   }, []);
 
   useEffect(() => {
-    document.documentElement.lang = lang;
-    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-  }, [lang]);
+    if (isClient) {
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    }
+  }, [lang, isClient]);
 
   const toggleLang = () => {
     setLang(prev => (prev === 'en' ? 'ar' : 'en'));
@@ -43,7 +46,7 @@ export function AppHeader() {
   return (
     <header className="bg-primary text-primary-foreground shadow-md sticky top-0 z-40">
       <div className="container mx-auto flex items-center justify-between p-4">
-        <Link href="/" className="flex items-center gap-3 text-xl font-bold font-headline">
+        <Link href="/" className="flex items-center gap-3 text-xl font-bold">
           <Image src="/white logo.png" alt="AGS Logo" width={100} height={100} className="h-12 w-auto" />
           <AppTitle />
         </Link>

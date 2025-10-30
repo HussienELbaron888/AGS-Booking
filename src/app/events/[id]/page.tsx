@@ -10,6 +10,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
+import React from 'react';
 
 interface EventPageProps {
   params: {
@@ -21,16 +22,18 @@ export default function EventPage({ params }: EventPageProps) {
   const [lang, setLang] = useState('en');
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
-  const { id } = params;
+  const id = React.use(Promise.resolve(params.id));
 
   useEffect(() => {
-    const html = document.documentElement;
-    const observer = new MutationObserver(() => {
-      setLang(html.lang || 'en');
+    setLang(document.documentElement.lang || 'en');
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'lang') {
+          setLang(document.documentElement.lang || 'en');
+        }
+      });
     });
-    observer.observe(html, { attributes: true, attributeFilter: ['lang'] });
-    setLang(html.lang || 'en'); // Initial set
-
+    observer.observe(document.documentElement, { attributes: true });
     return () => observer.disconnect();
   }, []);
 

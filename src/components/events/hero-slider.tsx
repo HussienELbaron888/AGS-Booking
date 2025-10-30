@@ -8,7 +8,6 @@ import { Event } from '@/lib/types';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
@@ -19,12 +18,15 @@ export function HeroSlider({ events }: { events: Event[] }) {
   const [lang, setLang] = useState('en');
 
   useEffect(() => {
-    const html = document.documentElement;
-    const observer = new MutationObserver(() => {
-      setLang(html.lang || 'en');
+    setLang(document.documentElement.lang || 'en');
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'lang') {
+          setLang(document.documentElement.lang || 'en');
+        }
+      });
     });
-    observer.observe(html, { attributes: true, attributeFilter: ['lang'] });
-    setLang(html.lang || 'en'); // Initial set
+    observer.observe(document.documentElement, { attributes: true });
     return () => observer.disconnect();
   }, []);
 

@@ -11,13 +11,15 @@ export default function AdminEventsPage() {
     const { events, loading } = useEvents();
 
     useEffect(() => {
-      const html = document.documentElement;
-      const observer = new MutationObserver(() => {
-        setLang(html.lang || 'en');
+      setLang(document.documentElement.lang || 'en');
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'lang') {
+            setLang(document.documentElement.lang || 'en');
+          }
+        });
       });
-      observer.observe(html, { attributes: true, attributeFilter: ['lang'] });
-      setLang(html.lang || 'en'); // Initial set
-  
+      observer.observe(document.documentElement, { attributes: true });
       return () => observer.disconnect();
     }, []);
 
