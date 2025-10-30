@@ -4,20 +4,25 @@ import { useEvent } from "@/hooks/useEvent";
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
 import { doc, updateDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { db, storage } from '@/lib/firebase';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import * as z from 'zod';
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
 
 const formSchema = z.object({
-    name: z.string().min(1, 'Name is required'),
-    date: z.string().min(1, 'Date is required'),
-    time: z.string().min(1, 'Time is required'),
-    description: z.string().min(1, 'Description is required'),
-    longDescription: z.string().min(1, 'Long description is required'),
-    image: z.string().url('Must be a valid URL').min(1, 'Image URL is required'),
-    targetAudience: z.string().min(1, 'Target audience is required'),
-    keyHighlights: z.string().min(1, 'Key highlights are required'),
+  name: z.string().min(1, 'Name is required'),
+  date: z.string().min(1, 'Date is required'),
+  time: z.string().min(1, 'Time is required'),
+  description: z.string().min(1, 'Description is required'),
+  longDescription: z.string().min(1, 'Long description is required'),
+  image: z
+    .custom<FileList>()
+    .refine((files) => files === undefined || (files && files.length > 0), 'Image is required')
+    .refine((files) => files === undefined || (files && Array.from(files).every(file => file.size <= 5 * 1024 * 1024)), `Max file size is 5MB.`)
+    .optional(),
+  targetAudience: z.string().min(1, 'Target audience is required'),
+  keyHighlights: z.string().min(1, 'Key highlights are required'),
 });
 
 export default function EditEventPage({ params }: { params: { id: string } }) {
@@ -43,19 +48,39 @@ export default function EditEventPage({ params }: { params: { id: string } }) {
     const eventRef = doc(db, 'events', event.id);
     
     try {
-        await updateDoc(eventRef, values);
-        alert('Event updated successfully!');
-        router.push('/admin/events');
+      let imageUrl = event.image;
+      if (values.image && values.image.length > 0) {
+        const imageFile = values.image[0];
+        const storageRef = ref(storage, `events/${Date.now()}_${imageFile.name}`);
+        const uploadResult = await uploadBytes(storageRef, imageFile);
+        imageUrl = await getDownloadURL(uploadResult.ref);
+      }
+      
+      const updatedEvent = {
+        name: values.name,
+        date: values.date,
+        time: values.time,
+        description: values.description,
+        longDescription: values.longDescription,
+        image: imageUrl,
+        targetAudience: values.targetAudience,
+        keyHighlights: values.keyHighlights,
+      };
+
+      await updateDoc(eventRef, updatedEvent);
+      alert('Event updated successfully!');
+      router.push('/admin/events');
     } catch (serverError) {
-        console.error('Error updating event:', serverError);
-        const permissionError = new FirestorePermissionError({
-            path: eventRef.path,
-            operation: 'update',
-            requestResourceData: values,
-        });
-        errorEmitter.emit('permission-error', permissionError);
-        alert('Failed to update event.');
-        setIsSubmitting(false);
+      console.error('Error updating event:', serverError);
+      const permissionError = new FirestorePermissionError({
+        path: eventRef.path,
+        operation: 'update',
+        requestResourceData: values,
+      });
+      errorEmitter.emit('permission-error', permissionError);
+      alert('Failed to update event.');
+    } finally {
+      setIsSubmitting(false);
     }
   }
 

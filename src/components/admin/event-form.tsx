@@ -27,14 +27,14 @@ export function EventForm({ event, onSubmit, isSubmitting, schema }: EventFormPr
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: event
-      ? { ...event }
+      ? { ...event, image: undefined } // Clear image field for file input
       : {
           name: '',
           date: '',
           time: '',
           description: '',
           longDescription: '',
-          image: '',
+          image: undefined,
           targetAudience: '',
           keyHighlights: '',
         },
@@ -113,7 +113,7 @@ export function EventForm({ event, onSubmit, isSubmitting, schema }: EventFormPr
           name="image"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Image URL</FormLabel>
+              <FormLabel>Image</FormLabel>
               {event?.image && (
                 <div className="my-2">
                   <p className="text-sm text-muted-foreground">Current Image:</p>
@@ -121,7 +121,11 @@ export function EventForm({ event, onSubmit, isSubmitting, schema }: EventFormPr
                 </div>
               )}
               <FormControl>
-                <Input type="url" placeholder="https://example.com/image.png" {...field} />
+                <Input 
+                  type="file" 
+                  accept="image/*"
+                  onChange={(e) => field.onChange(e.target.files)}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
