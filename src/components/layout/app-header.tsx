@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Languages, CalendarDays, User } from 'lucide-react';
+import { Languages, CalendarDays, User, Ticket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -31,6 +31,7 @@ export function AppHeader() {
   const navLinks = [
     { href: '/', label: lang === 'en' ? 'Events' : 'الأحداث' },
     { href: '/calendar', label: lang === 'en' ? 'Calendar' : 'التقويم', icon: CalendarDays },
+    { href: '/my-bookings', label: lang === 'en' ? 'My Bookings' : 'حجوزاتي', icon: Ticket },
     { href: '/admin', label: lang === 'en' ? 'Admin' : 'الإدارة' },
   ];
 
@@ -73,9 +74,6 @@ export function AppHeader() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-              <DropdownMenuItem>
-                {lang === 'en' ? 'My Bookings' : 'حجوزاتي'}
-              </DropdownMenuItem>
               <DropdownMenuItem>
                 {lang === 'en' ? 'Profile' : 'الملف الشخصي'}
               </DropdownMenuItem>
