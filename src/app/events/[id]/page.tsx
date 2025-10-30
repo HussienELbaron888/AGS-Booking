@@ -1,23 +1,25 @@
 'use client';
-import { getEventById } from '@/lib/data';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { Calendar, Clock, Info, Users } from 'lucide-react';
 import { SeatingChartWrapper } from '@/components/events/seating-chart-wrapper';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState } from 'react';
 import type { Event } from '@/lib/types';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 interface EventPageProps {
-  params: Promise<{
+  params: {
     id: string;
-  }>;
+  };
 }
 
 export default function EventPage({ params }: EventPageProps) {
   const [lang, setLang] = useState('en');
   const [event, setEvent] = useState<Event | null>(null);
-  const { id } = use(params);
+  const [loading, setLoading] = useState(true);
+  const { id } = params;
 
   useEffect(() => {
     const html = document.documentElement;
@@ -27,20 +29,30 @@ export default function EventPage({ params }: EventPageProps) {
     observer.observe(html, { attributes: true, attributeFilter: ['lang'] });
     setLang(html.lang || 'en'); // Initial set
 
-    // Fetch event data on the client to avoid hydration issues with random seat statuses
-    const eventData = getEventById(id);
-    if (eventData) {
-      setEvent(eventData);
-    }
+    const fetchEvent = async () => {
+      const docRef = doc(db, 'events', id);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setEvent({ id: docSnap.id, ...docSnap.data() } as Event);
+      } else {
+        notFound();
+      }
+      setLoading(false);
+    };
+
+    fetchEvent();
 
     return () => observer.disconnect();
   }, [id]);
-  
-  if (!event) {
-    // You can render a loading skeleton here
+
+  if (loading) {
     return <div>Loading...</div>;
   }
-  
+
+  if (!event) {
+    return notFound();
+  }
+
   const imagePlaceholder = PlaceHolderImages.find(p => p.imageUrl === event.image);
 
   return (

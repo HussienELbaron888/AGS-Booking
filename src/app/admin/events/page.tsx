@@ -3,11 +3,12 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import Link from "next/link";
 import { EventsDataTable } from "@/components/admin/events-data-table";
-import { events } from "@/lib/data";
+import { useEvents } from "@/hooks/useEvents";
 import { useEffect, useState } from "react";
 
 export default function AdminEventsPage() {
     const [lang, setLang] = useState('en');
+    const { events, loading } = useEvents();
 
     useEffect(() => {
       const html = document.documentElement;
@@ -19,6 +20,10 @@ export default function AdminEventsPage() {
   
       return () => observer.disconnect();
     }, []);
+
+  if (loading) {
+    return <div>Loading...</div>
+  }
 
   return (
     <div>

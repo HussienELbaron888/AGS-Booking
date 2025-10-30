@@ -1,10 +1,10 @@
 'use client';
 import { EventForm } from "@/components/admin/event-form";
+import { useEvent } from "@/hooks/useEvent";
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
-import { addDoc, collection } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { generateSeats } from '@/lib/seats';
 import * as z from 'zod';
 
 const formSchema = z.object({
@@ -18,7 +18,8 @@ const formSchema = z.object({
     keyHighlights: z.string().min(1, 'Key highlights are required'),
   });
 
-export default function NewEventPage() {
+export default function EditEventPage({ params }: { params: { id: string } }) {
+  const { event, loading } = useEvent(params.id);
   const [lang, setLang] = useState('en');
   const router = useRouter();
 
@@ -34,23 +35,30 @@ export default function NewEventPage() {
   }, []);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!event) return;
     try {
-      await addDoc(collection(db, 'events'), {
-        ...values,
-        seatingChart: generateSeats(),
-      });
-      alert('Event added successfully!');
+      const eventRef = doc(db, 'events', event.id);
+      await updateDoc(eventRef, values);
+      alert('Event updated successfully!');
       router.push('/admin/events');
     } catch (error) {
-      console.error('Error adding event: ', error);
-      alert('Failed to add event.');
+      console.error('Error updating event: ', error);
+      alert('Failed to update event.');
     }
   }
-  
+
+  if (loading) {
+    return <div>Loading...</div>
+  }
+
+  if (!event) {
+    return <div>Event not found</div>
+  }
+
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-6">{lang === 'en' ? 'Create New Event' : 'إنشاء حدث جديد'}</h1>
-      <EventForm onSubmit={onSubmit} />
+      <h1 className="text-3xl font-bold mb-6">{lang === 'en' ? 'Edit Event' : 'تعديل الحدث'}</h1>
+      <EventForm event={event} onSubmit={onSubmit} />
     </div>
   );
 }

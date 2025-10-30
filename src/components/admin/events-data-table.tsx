@@ -71,7 +71,7 @@ export function EventsDataTable({ data }: { data: Event[] }) {
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link href={`/admin/events/new`}> 
+                        <Link href={`/admin/events/${event.id}/edit`}> 
                             <Pencil className="mr-2 h-4 w-4 rtl:ml-2 rtl:mr-0" />
                             {lang === 'en' ? 'Edit' : 'تعديل'}
                         </Link>
