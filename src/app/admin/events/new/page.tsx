@@ -39,6 +39,7 @@ export default function NewEventPage() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
+    let eventsCollection;
     try {
       const imageFile = values.image[0];
       const storageRef = ref(storage, `events/${Date.now()}_${imageFile.name}`);
@@ -52,7 +53,7 @@ export default function NewEventPage() {
         seatingChart: generateSeats(),
       };
       
-      const eventsCollection = collection(db, 'events');
+      eventsCollection = collection(db, 'events');
       await addDoc(eventsCollection, newEvent);
       
       alert('Event added successfully!');
@@ -61,9 +62,9 @@ export default function NewEventPage() {
     } catch (error: any) {
       console.error('Error adding event: ', error);
       // Check if it's a permission error
-      if (error.code === 'permission-denied') {
+      if (error.code === 'permission-denied' && eventsCollection) {
           const permissionError = new FirestorePermissionError({
-              path: 'events', // collection path
+              path: eventsCollection.path,
               operation: 'create',
               requestResourceData: {
                   ...values,
@@ -72,7 +73,7 @@ export default function NewEventPage() {
           });
           errorEmitter.emit('permission-error', permissionError);
       }
-      alert('Failed to add event. Please check permissions and try again.');
+      alert(`Failed to add event. ${error.message}`);
       setIsSubmitting(false);
     }
   }
