@@ -19,15 +19,18 @@ const generateSeats = () => {
     const seatingChart = { rows: [] };
     const rowLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T'];
   
+    let seatCounter = 0;
+
     rowLetters.forEach((rowId, rowIndex) => {
       const row = { id: rowId, seats: [] };
   
       // Left section (4 seats)
       for (let i = 1; i <= 4; i++) {
+        seatCounter++;
         const seat = {
           id: `${rowId}L${i}`,
           number: `${i}`,
-          status: Math.random() > 0.3 ? 'available' : 'unavailable',
+          status: seatCounter % 4 !== 0 ? 'available' : 'unavailable',
           type: 'seat',
           section: 'left',
         };
@@ -50,10 +53,11 @@ const generateSeats = () => {
           });
           continue;
         }
+        seatCounter++;
         const seat = {
           id: `${rowId}C${i}`,
           number: `${i}`,
-          status: Math.random() > 0.3 ? 'available' : 'unavailable',
+          status: seatCounter % 5 !== 0 ? 'available' : 'unavailable',
           type: 'seat',
           section: 'center',
         };
@@ -65,10 +69,11 @@ const generateSeats = () => {
   
       // Right section (4 seats)
       for (let i = 1; i <= 4; i++) {
+        seatCounter++;
         const seat = {
           id: `${rowId}R${i}`,
           number: `${i}`,
-          status: Math.random() > 0.3 ? 'available' : 'unavailable',
+          status: seatCounter % 6 !== 0 ? 'available' : 'unavailable',
           type: 'seat',
           section: 'right',
         };
