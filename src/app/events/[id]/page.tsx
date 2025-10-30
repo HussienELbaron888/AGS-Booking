@@ -22,7 +22,7 @@ export default function EventPage({ params }: EventPageProps) {
   const [lang, setLang] = useState('en');
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
-  const id = React.use(Promise.resolve(params.id));
+  const { id } = params;
 
   useEffect(() => {
     setLang(document.documentElement.lang || 'en');
