@@ -3,9 +3,9 @@ import { EventList } from '@/components/events/event-list';
 import { useEffect, useState } from 'react';
 import { useEvents } from '@/hooks/useEvents';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Calendar, Sparkles } from 'lucide-react';
-import Image from 'next/image';
+import { Sparkles } from 'lucide-react';
 import Link from 'next/link';
+import { HeroSlider } from '@/components/events/hero-slider';
 
 export default function Home() {
   const [lang, setLang] = useState('en');
@@ -30,42 +30,7 @@ export default function Home() {
 
   return (
     <div dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-      <section className="bg-background py-20 md:py-32">
-        <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
-          <div className="text-center md:text-left">
-            <h1 className="text-4xl md:text-6xl font-extrabold font-headline text-foreground mb-4">
-              {lang === 'en' ? 'Experience Our School\'s Vibrant Events' : 'استكشف فعاليات مدرستنا المليئة بالحياة'}
-            </h1>
-            <p className="text-lg md:text-xl text-muted-foreground mb-8">
-              {lang === 'en' ? 'From theater shows to science fairs, be a part of our community. Book your tickets and join the excitement.' : 'من العروض المسرحية إلى المعارض العلمية، كن جزءًا من مجتمعنا. احجز تذكرتك وانضم إلى الإثارة.'}
-            </p>
-            <div className="flex gap-4 justify-center md:justify-start">
-              <Button size="lg" asChild>
-                <Link href="#events">
-                  {lang === 'en' ? 'Browse Events' : 'تصفح الفعاليات'}
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild>
-                <Link href="/calendar">
-                  <Calendar className="mr-2 h-5 w-5" />
-                  {lang === 'en' ? 'View Calendar' : 'عرض التقويم'}
-                </Link>
-              </Button>
-            </div>
-          </div>
-          <div className="relative h-64 md:h-96 rounded-2xl overflow-hidden shadow-2xl">
-            <Image 
-              src="https://picsum.photos/seed/school-event/1200/800"
-              alt="School Event"
-              fill
-              className="object-cover"
-              data-ai-hint="school event community"
-            />
-             <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent"></div>
-          </div>
-        </div>
-      </section>
+      <HeroSlider events={events} loading={loading} />
       
       <section id="events" className="container mx-auto py-16 px-4">
         <div className="text-center mb-12">
