@@ -5,14 +5,11 @@ import { Calendar, Clock, ArrowRight } from 'lucide-react';
 import {
   Card,
   CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  CardDescription
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import type { Event } from '@/lib/types';
 import { useEffect, useState } from 'react';
+import { Badge } from '@/components/ui/badge';
 
 interface EventCardProps {
   event: Event;
@@ -22,7 +19,8 @@ export function EventCard({ event }: EventCardProps) {
   const [lang, setLang] = useState('en');
 
   useEffect(() => {
-    setLang(document.documentElement.lang || 'en');
+    const initialLang = document.documentElement.lang || 'en';
+    setLang(initialLang);
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.type === 'attributes' && mutation.attributeName === 'lang') {
@@ -35,41 +33,39 @@ export function EventCard({ event }: EventCardProps) {
   }, []);
 
   return (
-    <Card className="flex flex-col overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-2 border-secondary" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-      <CardHeader className="p-0">
-        <div className="relative h-48 w-full">
-          <Image
-            src={event.image}
-            alt={event.name}
-            fill
-            className="object-cover"
-            data-ai-hint="theater stage"
-          />
-           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+    <Card className="flex flex-col overflow-hidden transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-1 group" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+      <div className="relative h-52 w-full overflow-hidden">
+        <Image
+          src={event.image}
+          alt={event.name}
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          data-ai-hint="theater stage"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        />
+        <div className="absolute top-4 right-4 rtl:left-4 rtl:right-auto">
+          <Badge variant="secondary" className="font-semibold">{new Date(event.date).toLocaleDateString(lang === 'ar' ? 'ar-SA' : 'en-US', { month: 'short', day: 'numeric' })}</Badge>
         </div>
-      </CardHeader>
-      <CardContent className="flex-grow p-6">
-        <CardTitle className="font-headline text-xl mb-2 text-foreground">{event.name}</CardTitle>
-        <CardDescription className="text-muted-foreground line-clamp-2 mb-4">{event.description}</CardDescription>
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-accent" />
-            <span>{new Date(event.date).toLocaleDateString(lang === 'ar' ? 'ar-SA' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-accent" />
-            <span>{event.time}</span>
-          </div>
+      </div>
+      <CardContent className="flex-grow p-5 flex flex-col">
+        <h3 className="font-headline font-bold text-xl mb-2 text-foreground flex-grow">{event.name}</h3>
+        <p className="text-muted-foreground text-sm line-clamp-2 mb-4">{event.description}</p>
+        
+        <div className="border-t border-border pt-4 mt-auto">
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Clock className="h-4 w-4" />
+                    <span>{event.time}</span>
+                </div>
+                 <Button asChild variant="ghost" size="sm" className="h-auto px-2 py-1">
+                  <Link href={`/events/${event.id}`}>
+                    {lang === 'en' ? 'Book Now' : 'احجز الآن'}
+                    <ArrowRight className="ml-1 h-4 w-4 rtl:mr-1 rtl:ml-0" />
+                  </Link>
+                </Button>
+            </div>
         </div>
       </CardContent>
-      <CardFooter className="p-6 pt-0">
-        <Button asChild className="w-full">
-          <Link href={`/events/${event.id}`}>
-            {lang === 'en' ? 'View Details & Book' : 'عرض التفاصيل والحجز'}
-            <ArrowRight className="ml-2 h-4 w-4 rtl:mr-2 rtl:ml-0" />
-          </Link>
-        </Button>
-      </CardFooter>
     </Card>
   );
 }
