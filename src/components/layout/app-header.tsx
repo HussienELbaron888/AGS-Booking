@@ -44,24 +44,24 @@ export function AppHeader() {
   ];
 
   return (
-    <header className="bg-primary text-primary-foreground shadow-md sticky top-0 z-40">
+    <header className="bg-background/80 text-foreground shadow-sm backdrop-blur-md sticky top-0 z-40 border-b">
       <div className="container mx-auto flex items-center justify-between p-4">
         <Link href="/" className="flex items-center gap-3 text-xl font-bold">
-          <Image src="/white logo.png" alt="AGS Logo" width={100} height={100} className="h-12 w-auto" />
-          <AppTitle />
+          <Image src="/white logo.png" alt="AGS Logo" width={100} height={100} className="h-10 w-auto" />
         </Link>
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-2">
           {navLinks.map(link => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`flex items-center gap-2 font-bold text-base transition-colors hover:text-accent ${
-                pathname === link.href ? 'text-accent' : 'text-primary-foreground'
-              }`}
-            >
-              {link.icon && <link.icon className="h-4 w-4" />}
-              {link.label}
-            </Link>
+            <Button key={link.href} variant="ghost" asChild className={`font-bold text-base transition-colors hover:text-primary ${
+                pathname === link.href ? 'text-primary' : ''
+              }`}>
+              <Link
+                href={link.href}
+                className="flex items-center gap-2"
+              >
+                {link.icon && <link.icon className="h-4 w-4" />}
+                {link.label}
+              </Link>
+            </Button>
           ))}
         </nav>
         <div className="flex items-center gap-2">

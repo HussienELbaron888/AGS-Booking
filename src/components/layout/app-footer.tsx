@@ -6,7 +6,6 @@ export function AppFooter() {
   const [lang, setLang] = useState('en');
 
   useEffect(() => {
-    // Set initial language from document, then update state
     setLang(document.documentElement.lang || 'en');
     
     const observer = new MutationObserver((mutations) => {
@@ -23,7 +22,7 @@ export function AppFooter() {
   }, []);
 
   return (
-    <footer className="bg-primary text-primary-foreground py-8 mt-16">
+    <footer className="bg-secondary text-secondary-foreground py-8 mt-16">
       <div className="container mx-auto flex flex-col justify-center items-center gap-4">
         <Image
           src="/white logo.png"
@@ -32,7 +31,7 @@ export function AppFooter() {
           height={60}
           className="object-contain"
         />
-        <p className="text-sm text-center text-primary-foreground/80" suppressHydrationWarning>
+        <p className="text-sm text-center text-muted-foreground" suppressHydrationWarning>
           {lang === 'ar'
             ? 'جميع الحقوق محفوظة لـ AGS | 2025 - تصميم وتطوير بواسطة Pixelle®'
             : 'All Rights reserved to AGS | 2025 - Design & Developed by Pixelle®'}

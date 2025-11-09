@@ -35,7 +35,7 @@ export function EventCard({ event }: EventCardProps) {
   }, []);
 
   return (
-    <Card className="flex flex-col overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+    <Card className="flex flex-col overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-2 border-secondary" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <CardHeader className="p-0">
         <div className="relative h-48 w-full">
           <Image
@@ -45,11 +45,12 @@ export function EventCard({ event }: EventCardProps) {
             className="object-cover"
             data-ai-hint="theater stage"
           />
+           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
         </div>
       </CardHeader>
       <CardContent className="flex-grow p-6">
-        <CardTitle className="font-headline text-xl mb-2 text-primary">{event.name}</CardTitle>
-        <CardDescription className="text-muted-foreground line-clamp-3 mb-4">{event.description}</CardDescription>
+        <CardTitle className="font-headline text-xl mb-2 text-foreground">{event.name}</CardTitle>
+        <CardDescription className="text-muted-foreground line-clamp-2 mb-4">{event.description}</CardDescription>
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4 text-accent" />
@@ -62,7 +63,7 @@ export function EventCard({ event }: EventCardProps) {
         </div>
       </CardContent>
       <CardFooter className="p-6 pt-0">
-        <Button asChild className="w-full bg-primary hover:bg-primary/90">
+        <Button asChild className="w-full">
           <Link href={`/events/${event.id}`}>
             {lang === 'en' ? 'View Details & Book' : 'عرض التفاصيل والحجز'}
             <ArrowRight className="ml-2 h-4 w-4 rtl:mr-2 rtl:ml-0" />
