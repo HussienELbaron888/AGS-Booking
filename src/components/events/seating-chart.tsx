@@ -55,7 +55,7 @@ export function SeatingChart({ seatingChart, selectedSeats, onSeatClick }: Seati
       <div className="bg-muted/50 p-2 rounded-md mb-4 flex items-center justify-between">
         <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs items-center">
             <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm border bg-card"></div>{lang === 'en' ? 'Available' : 'متاح'}</div>
-            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-accent"></div>{lang === 'en' ? 'Selected' : 'محدد'}</div>
+            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-green-500"></div>{lang === 'en' ? 'Selected' : 'محدد'}</div>
             <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-muted-foreground/50 opacity-50"></div>{lang === 'en' ? 'Reserved' : 'محجوز'}</div>
         </div>
         <div className="flex items-center gap-1">
