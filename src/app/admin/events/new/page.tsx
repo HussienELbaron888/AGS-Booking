@@ -44,13 +44,15 @@ export default function NewEventPage() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
+    const eventsCollection = collection(db, 'events');
+
     try {
       const imageFile = values.image[0];
       const storageRef = ref(storage, `events/${Date.now()}_${imageFile.name}`);
       const uploadResult = await uploadBytes(storageRef, imageFile);
       const imageUrl = await getDownloadURL(uploadResult.ref);
       
-      const newEvent = {
+      const newEventData = {
         name: values.name,
         date: values.date,
         time: values.time,
@@ -62,16 +64,22 @@ export default function NewEventPage() {
         seatingChart: generateSeats(),
       };
       
-      const eventsCollection = collection(db, 'events');
-      await addDoc(eventsCollection, newEvent);
+      await addDoc(eventsCollection, newEventData);
       
       alert('Event added successfully!');
       router.push('/admin/events');
 
-    } catch (error: any) {
-      console.error('Error adding event: ', error);
-      // We will now show the actual error from Firebase/Storage
-      alert(`Failed to add event. Error: ${error.message}`);
+    } catch (serverError: any) {
+      console.error('Error adding event:', serverError);
+      
+      const permissionError = new FirestorePermissionError({
+        path: eventsCollection.path,
+        operation: 'create',
+        requestResourceData: values,
+      });
+      errorEmitter.emit('permission-error', permissionError);
+
+      alert(`Failed to add event. Error: ${serverError.message}`);
     } finally {
       setIsSubmitting(false);
     }
