@@ -23,15 +23,29 @@ export const generateSeats = (): SeatingChart => {
     row.seats.push({ id: `${rowId}-aisle1`, number: '', status: 'available', type: 'aisle', section: 'aisle' });
     
     // Center section (8 seats)
-    for (let i = 1; i <= 8; i++) {
-      const seat: Seat = {
-        id: `${rowId}C${i}`,
-        number: `${i}`,
-        status: 'available',
-        type: 'seat',
-        section: 'center',
-      };
-      row.seats.push(seat);
+    if (rowIndex === 0) { // If it's the first row (Row A)
+        // Add empty spaces instead of seats for the center section
+        for (let i = 1; i <= 8; i++) {
+            const seat: Seat = {
+                id: `${rowId}C${i}-empty`,
+                number: '',
+                status: 'unavailable',
+                type: 'empty',
+                section: 'center',
+            };
+            row.seats.push(seat);
+        }
+    } else {
+        for (let i = 1; i <= 8; i++) {
+          const seat: Seat = {
+            id: `${rowId}C${i}`,
+            number: `${i}`,
+            status: 'available',
+            type: 'seat',
+            section: 'center',
+          };
+          row.seats.push(seat);
+        }
     }
     
     // Aisle (empty space)
