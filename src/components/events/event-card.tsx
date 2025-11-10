@@ -40,7 +40,7 @@ export function EventCard({ event }: EventCardProps) {
       <div className="relative h-52 w-full overflow-hidden">
         <Image
           src={event.image}
-          alt={eventName}
+          alt={eventName || event.name}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"
           data-ai-hint="theater stage"
