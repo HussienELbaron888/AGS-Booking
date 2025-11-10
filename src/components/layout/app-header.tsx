@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Languages, User, Menu, X, CalendarDays, Ticket } from 'lucide-react';
+import { Languages, User, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -21,13 +21,15 @@ export function AppHeader() {
   const [isClient, setIsClient] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
+  const isHomePage = pathname === '/';
+
   useEffect(() => {
     setIsClient(true);
     const initialLang = document.documentElement.lang || 'en';
     setLang(initialLang);
 
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      setIsScrolled(window.scrollY > 50);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -52,10 +54,24 @@ export function AppHeader() {
     { href: '/admin', label: lang === 'en' ? 'Admin Panel' : 'لوحة التحكم' },
   ];
 
+  const headerClasses = cn(
+    "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+    {
+      'bg-transparent text-white': isHomePage && !isScrolled,
+      'bg-background/95 text-foreground border-b shadow-sm backdrop-blur-sm': !isHomePage || isScrolled,
+    }
+  );
+
   const NavContent = () => (
     <>
       {navLinks.map(link => (
-        <Button key={link.href} variant="ghost" asChild className={cn("font-semibold text-base transition-colors hover:text-primary", { 'text-primary': pathname === link.href })}>
+        <Button key={link.href} variant="ghost" asChild className={cn(
+          "font-semibold text-base transition-colors hover:text-primary",
+          { 'text-primary': pathname === link.href, 
+            'text-white': isHomePage && !isScrolled,
+            'text-foreground': !isHomePage || isScrolled
+          }
+        )}>
           <Link href={link.href}>
             {link.label}
           </Link>
@@ -65,7 +81,7 @@ export function AppHeader() {
   );
 
   return (
-    <header className={cn("sticky top-0 z-50 w-full transition-all duration-300", isScrolled ? "bg-background/95 border-b shadow-sm backdrop-blur-sm" : "bg-background")}>
+    <header className={headerClasses}>
       <div className="container mx-auto flex items-center justify-between p-4 h-20">
         <Link href="/" className="flex items-center gap-3">
           <Image src="/white logo.png" alt="AGS Logo" width={100} height={40} className="h-10 w-auto" />
@@ -74,13 +90,13 @@ export function AppHeader() {
           <NavContent />
         </nav>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" onClick={toggleLang} aria-label={lang === 'en' ? 'Change language' : 'تغيير اللغة'}>
+          <Button variant="ghost" size="icon" onClick={toggleLang} aria-label={lang === 'en' ? 'Change language' : 'تغيير اللغة'} className={cn({'text-white hover:text-primary': isHomePage && !isScrolled, 'text-foreground hover:text-primary': !isHomePage || isScrolled})}>
             <Languages className="h-5 w-5" />
           </Button>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label={lang === 'en' ? 'User menu' : 'قائمة المستخدم'}>
+              <Button variant="ghost" size="icon" aria-label={lang === 'en' ? 'User menu' : 'قائمة المستخدم'} className={cn({'text-white hover:text-primary': isHomePage && !isScrolled, 'text-foreground hover:text-primary': !isHomePage || isScrolled})}>
                 <User className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
@@ -93,7 +109,7 @@ export function AppHeader() {
           <div className="md:hidden">
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label={lang === 'en' ? 'Open menu' : 'فتح القائمة'}>
+                <Button variant="ghost" size="icon" aria-label={lang === 'en' ? 'Open menu' : 'فتح القائمة'} className={cn({'text-white hover:text-primary': isHomePage && !isScrolled, 'text-foreground hover:text-primary': !isHomePage || isScrolled})}>
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>

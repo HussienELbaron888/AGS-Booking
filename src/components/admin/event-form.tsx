@@ -46,6 +46,8 @@ export function EventForm({ event, onSubmit, isSubmitting, schema }: EventFormPr
           image: undefined,
           keyHighlights: '',
           venue: 'boys-theater',
+          numberOfSeats: 508,
+          excludedSeats: '',
         },
   });
 
@@ -63,7 +65,10 @@ export function EventForm({ event, onSubmit, isSubmitting, schema }: EventFormPr
                 <FormLabel>Venue</FormLabel>
                 <FormControl>
                   <RadioGroup
-                    onValueChange={field.onChange}
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      form.setValue('numberOfSeats', value === 'boys-theater' ? 508 : 413);
+                    }}
                     defaultValue={field.value}
                     className="flex flex-col space-y-1"
                   >
@@ -90,6 +95,19 @@ export function EventForm({ event, onSubmit, isSubmitting, schema }: EventFormPr
             )}
           />
         )}
+        <FormField
+          control={form.control}
+          name="numberOfSeats"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Number of Seats</FormLabel>
+              <FormControl>
+                <Input type="number" {...field} disabled />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -167,6 +185,19 @@ export function EventForm({ event, onSubmit, isSubmitting, schema }: EventFormPr
               <FormLabel>Short Description (Arabic)</FormLabel>
               <FormControl>
                 <Textarea placeholder="وصف مختصر" {...field} dir="rtl"/>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="excludedSeats"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Excluded Seats</FormLabel>
+              <FormControl>
+                <Textarea placeholder="e.g., A1, B, C5" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

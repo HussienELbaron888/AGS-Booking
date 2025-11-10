@@ -56,7 +56,7 @@ export function SeatingChart({ seatingChart, selectedSeats, onSeatClick }: Seati
         <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs items-center">
             <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm border bg-card"></div>{lang === 'en' ? 'Available' : 'متاح'}</div>
             <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-green-500"></div>{lang === 'en' ? 'Selected' : 'محدد'}</div>
-            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-muted-foreground/50 opacity-50"></div>{lang === 'en' ? 'Reserved' : 'محجوز'}</div>
+            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-red-500 opacity-50"></div>{lang === 'en' ? 'Blocked' : 'محجوز'}</div>
         </div>
         <div className="flex items-center gap-1">
           <Button variant="outline" size="icon" onClick={handleZoomOut} className="h-8 w-8"><ZoomOut className="h-4 w-4" /></Button>

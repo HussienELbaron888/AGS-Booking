@@ -39,7 +39,7 @@ export function Seat({ seat, isSelected, onClick, size }: SeatProps) {
           'cursor-not-allowed': !isClickable && !isSelected,
           'text-card-foreground/50 hover:text-green-500 hover:scale-110': seat.status === 'available',
           'text-green-500 scale-110 shadow-lg': isSelected,
-          'text-muted-foreground/30 opacity-50': seat.status === 'reserved' || seat.status === 'unavailable',
+          'text-red-500 opacity-50': seat.status === 'reserved' || seat.status === 'unavailable' || seat.status === 'blocked',
         }
       )}
     >

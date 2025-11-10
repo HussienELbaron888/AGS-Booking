@@ -21,7 +21,7 @@ import { generateSeatsGirls } from '@/lib/seats-girls';
 import * as z from 'zod';
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
-import { SeatingChart } from "@/lib/types";
+import { SeatingChart, Seat } from "@/lib/types";
 
 const formSchema = z.object({
   name_en: z.string().min(1, 'English name is required'),
@@ -38,6 +38,8 @@ const formSchema = z.object({
   venue: z.enum(['boys-theater', 'girls-theater'], {
     required_error: "You need to select a venue.",
   }),
+  numberOfSeats: z.number(),
+  excludedSeats: z.string().optional(),
 });
 
 
@@ -46,7 +48,6 @@ export default function AdminEventsPage() {
     const { events, loading } = useEvents();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const router = useRouter();
 
     useEffect(() => {
       setLang(document.documentElement.lang || 'en');
@@ -61,11 +62,35 @@ export default function AdminEventsPage() {
       return () => observer.disconnect();
     }, []);
 
-    const countAvailableSeats = (seatingChart: SeatingChart) => {
-      return seatingChart.rows.reduce((count, row) => {
-        return count + row.seats.filter(seat => seat.type === 'seat').length;
-      }, 0);
+    const applyExclusions = (seatingChart: SeatingChart, excludedSeats: string) => {
+      const excludedItems = excludedSeats.split(',').map(item => item.trim().toUpperCase());
+    
+      excludedItems.forEach(item => {
+        seatingChart.rows.forEach(row => {
+          // Exclude a full row across all sections (e.g., 'B')
+          if (item === row.id) {
+            row.seats.forEach(seat => {
+              if (seat.type === 'seat') seat.status = 'blocked';
+            });
+          } else {
+            row.seats.forEach(seat => {
+              // Exclude a specific seat by its unique ID (e.g., 'BC1', 'BL1', 'BR1')
+              if (seat.id === item && seat.type === 'seat') {
+                seat.status = 'blocked';
+              }
+            });
+          }
+        });
+      });
+    
+      return seatingChart;
     };
+
+      const countAvailableSeats = (seatingChart: SeatingChart) => {
+        return seatingChart.rows.reduce((count, row) => {
+          return count + row.seats.filter(seat => seat.type === 'seat' && seat.status === 'available').length;
+        }, 0);
+      };
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
       setIsSubmitting(true);
@@ -77,7 +102,12 @@ export default function AdminEventsPage() {
         const uploadResult = await uploadBytes(storageRef, imageFile);
         const imageUrl = await getDownloadURL(uploadResult.ref);
         
-        const seatingChart = values.venue === 'boys-theater' ? generateSeats() : generateSeatsGirls();
+        let seatingChart = values.venue === 'boys-theater' ? generateSeats() : generateSeatsGirls();
+
+        if (values.excludedSeats) {
+            seatingChart = applyExclusions(seatingChart, values.excludedSeats);
+        }
+
         const availableSeats = countAvailableSeats(seatingChart);
   
         const newEventData = {
@@ -93,8 +123,8 @@ export default function AdminEventsPage() {
           keyHighlights: values.keyHighlights,
           venue: values.venue,
           seatingChart: seatingChart,
-          totalSeats: availableSeats,
-          seatsAvailable: availableSeats
+          totalSeats: values.numberOfSeats,
+          seatsAvailable: availableSeats,
         };
         
         await addDoc(eventsCollection, newEventData);

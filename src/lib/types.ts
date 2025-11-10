@@ -1,19 +1,15 @@
 export interface Event {
   id: string;
-  name: string; // This will be used as a fallback or for internal display. UI will use name_en/name_ar
-  name_en: string;
-  name_ar: string;
+  name: string;
   date: string;
   time: string;
   description: string;
-  description_en: string;
-  description_ar: string;
+  longDescription: string;
   image: string;
   seatingChart: SeatingChart;
+  targetAudience: string;
   keyHighlights: string;
-  venue: 'boys-theater' | 'girls-theater';
-  totalSeats: number;
-  seatsAvailable: number;
+  venue?: 'boys-theater' | 'girls-theater';
 }
 
 export interface SeatingChart {
