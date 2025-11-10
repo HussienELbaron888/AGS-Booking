@@ -25,8 +25,8 @@ export type SeatSection = 'left' | 'center' | 'right' | 'aisle';
 
 export interface Seat {
   id: string;
-  number: string;
-  status: SeatStatus;
+  number?: string;
+  status?: SeatStatus;
   type: 'seat' | 'aisle' | 'empty';
   section: SeatSection;
 }

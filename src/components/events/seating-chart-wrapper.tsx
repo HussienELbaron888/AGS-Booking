@@ -6,7 +6,7 @@ import { SeatingChart } from './seating-chart';
 import { Button } from '@/components/ui/button';
 import { Ticket, X, CheckCircle, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { doc, runTransaction } from 'firebase/firestore';
+import { doc, runTransaction, getDoc } from 'firebase/firestore'; // Import getDoc
 import { db } from '@/lib/firebase';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
@@ -15,7 +15,8 @@ interface SeatingChartWrapperProps {
   event: Event;
 }
 
-export function SeatingChartWrapper({ event }: SeatingChartWrapperProps) {
+export function SeatingChartWrapper({ event: initialEvent }: SeatingChartWrapperProps) { // Rename for clarity
+  const [event, setEvent] = useState(initialEvent);
   const [selectedSeats, setSelectedSeats] = useState<Seat[]>([]);
   const [bookingStatus, setBookingStatus] = useState<'idle' | 'booked' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
@@ -23,6 +24,16 @@ export function SeatingChartWrapper({ event }: SeatingChartWrapperProps) {
   const [lang, setLang] = useState('en');
 
   useEffect(() => {
+    // Force refresh event data on component mount to bypass cache
+    const fetchEventData = async () => {
+      const eventRef = doc(db, 'events', initialEvent.id);
+      const docSnap = await getDoc(eventRef);
+      if (docSnap.exists()) {
+        setEvent(docSnap.data() as Event);
+      }
+    };
+    fetchEventData();
+
     setLang(document.documentElement.lang || 'en');
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
@@ -33,7 +44,7 @@ export function SeatingChartWrapper({ event }: SeatingChartWrapperProps) {
     });
     observer.observe(document.documentElement, { attributes: true });
     return () => observer.disconnect();
-  }, []);
+  }, [initialEvent.id]);
 
   const handleSeatClick = (seat: Seat) => {
     if (seat.status !== 'available') return;
@@ -84,7 +95,6 @@ export function SeatingChartWrapper({ event }: SeatingChartWrapperProps) {
           if (canBook) {
             transaction.update(eventRef, { seatingChart: newSeatingChart });
           } else {
-            // No need to throw an error here, just prevents the transaction from committing.
             return Promise.reject(new Error(errorMessage || "One or more seats are no longer available."));
           }
         });
@@ -110,6 +120,15 @@ export function SeatingChartWrapper({ event }: SeatingChartWrapperProps) {
     setSelectedSeats([]);
     setBookingStatus('idle');
     setErrorMessage('');
+    // Refetch data to show the latest seating chart status after a reset
+    const fetchEventData = async () => {
+      const eventRef = doc(db, 'events', initialEvent.id);
+      const docSnap = await getDoc(eventRef);
+      if (docSnap.exists()) {
+        setEvent(docSnap.data() as Event);
+      }
+    };
+    fetchEventData();
   }
 
   if (bookingStatus === 'booked') {

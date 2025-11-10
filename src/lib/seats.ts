@@ -1,68 +1,41 @@
 import type { SeatingChart, SeatingRow, Seat } from './types';
 
 export const generateSeats = (): SeatingChart => {
+  console.log("Generating final seat map with correct alignment...");
   const seatingChart: SeatingChart = { rows: [] };
   const rowLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T'];
-  
-  rowLetters.forEach((rowId, rowIndex) => {
-    const row: SeatingRow = { id: rowId, seats: [] };
-    
-    // Left section (4 seats)
-    for (let i = 1; i <= 4; i++) {
-      const seat: Seat = {
-        id: `${rowId}L${i}`,
-        number: `${i}`,
-        status: 'available',
-        type: 'seat',
-        section: 'left',
-      };
-      row.seats.push(seat);
-    }
-    
-    // Aisle (empty space)
-    row.seats.push({ id: `${rowId}-aisle1`, number: '', status: 'available', type: 'aisle', section: 'aisle' });
-    
-    // Center section (8 seats)
-    if (rowIndex === 0) { // If it's the first row (Row A)
-        // Add empty spaces instead of seats for the center section
-        for (let i = 1; i <= 8; i++) {
-            const seat: Seat = {
-                id: `${rowId}C${i}-empty`,
-                number: '',
-                status: 'unavailable',
-                type: 'empty',
-                section: 'center',
-            };
-            row.seats.push(seat);
-        }
-    } else {
-        for (let i = 1; i <= 8; i++) {
-          const seat: Seat = {
-            id: `${rowId}C${i}`,
-            number: `${i}`,
-            status: 'available',
-            type: 'seat',
-            section: 'center',
-          };
-          row.seats.push(seat);
-        }
-    }
-    
-    // Aisle (empty space)
-    row.seats.push({ id: `${rowId}-aisle2`, number: '', status: 'available', type: 'aisle', section: 'aisle' });
 
-    // Right section (4 seats)
-    for (let i = 1; i <= 4; i++) {
-      const seat: Seat = {
-        id: `${rowId}R${i}`,
-        number: `${i}`,
-        status: 'available',
-        type: 'seat',
-        section: 'right',
-      };
-      row.seats.push(seat);
+  rowLetters.forEach((rowId) => {
+    const row: SeatingRow = { id: rowId, seats: [] };
+
+    // Left section (7 seats) - Numbering from right to left
+    for (let i = 7; i >= 1; i--) {
+      row.seats.push({ id: `${rowId}L${i}`, number: `${i}`, status: 'available', type: 'seat', section: 'left' });
     }
-    
+
+    // Aisle
+    row.seats.push({ id: `${rowId}A1`, type: 'aisle', section: 'aisle' });
+
+    // Center section (12 seats)
+    if (rowId !== 'A') {
+      for (let i = 1; i <= 12; i++) {
+        row.seats.push({ id: `${rowId}C${i}`, number: `${i}`, status: 'available', type: 'seat', section: 'center' });
+      }
+    } else {
+      // Add aisle placeholders for Row A center section to maintain alignment
+      for (let i = 1; i <= 12; i++) {
+        row.seats.push({ id: `${rowId}C_aisle_${i}`, type: 'aisle', section: 'center' });
+      }
+    }
+
+    // Aisle
+    row.seats.push({ id: `${rowId}A2`, type: 'aisle', section: 'aisle' });
+
+    // Right section (7 seats)
+    for (let i = 1; i <= 7; i++) {
+      row.seats.push({ id: `${rowId}R${i}`, number: `${i}`, status: 'available', type: 'seat', section: 'right' });
+    }
+
     seatingChart.rows.push(row);
   });
 
