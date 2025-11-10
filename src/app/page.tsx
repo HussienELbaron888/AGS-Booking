@@ -38,21 +38,36 @@ export default function Home() {
       
       <section id="events" className="container mx-auto py-16 px-4 space-y-16">
         
-        {/* Boys' Theater Events */}
-        {loading ? (
-          <div>
-            <div className="text-center mb-12">
-               <div className="inline-flex items-center gap-2 bg-primary/10 text-primary font-semibold py-1 px-4 rounded-full mb-4">
-                <Drama className="h-5 w-5" />
-                <span>{lang === 'en' ? "Boys' Theater Events" : 'فعاليات مسرح البنين'}</span>
+        {loading && (
+          <>
+            <div>
+              <div className="text-center mb-12">
+                <div className="inline-flex items-center gap-2 bg-primary/10 text-primary font-semibold py-1 px-4 rounded-full mb-4">
+                  <Drama className="h-5 w-5" />
+                  <span>{lang === 'en' ? "Boys' Theater Events" : 'فعاليات مسرح البنين'}</span>
+                </div>
+                <h2 className="text-3xl md:text-4xl font-extrabold font-headline text-foreground mb-2">
+                  {lang === 'en' ? 'Stage is Set' : 'العروض القادمة'}
+                </h2>
               </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold font-headline text-foreground mb-2">
-                {lang === 'en' ? 'Stage is Set' : 'العروض القادمة'}
-              </h2>
+              <EventList events={[]} loading={true} />
             </div>
-            <EventList events={[]} loading={true} />
-          </div>
-        ) : boysEvents.length > 0 && (
+             <div>
+              <div className="text-center mb-12">
+                <div className="inline-flex items-center gap-2 bg-pink-500/10 text-pink-600 dark:text-pink-400 font-semibold py-1 px-4 rounded-full mb-4">
+                  <School className="h-5 w-5" />
+                  <span>{lang === 'en' ? "Girls' Theater Events" : 'فعاليات مسرح البنات'}</span>
+                </div>
+                <h2 className="text-3xl md:text-4xl font-extrabold font-headline text-foreground mb-2">
+                  {lang === 'en' ? 'Spotlight On' : 'تحت الأضواء'}
+                </h2>
+              </div>
+              <EventList events={[]} loading={true} />
+            </div>
+          </>
+        )}
+
+        {!loading && boysEvents.length > 0 && (
           <div>
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 bg-primary/10 text-primary font-semibold py-1 px-4 rounded-full mb-4">
@@ -66,25 +81,11 @@ export default function Home() {
                 {lang === 'en' ? 'Check out the upcoming events at the boys\' theater.' : 'اكتشف الفعاليات القادمة في مسرح البنين.'}
               </p>
             </div>
-            <EventList events={boysEvents} loading={loading} />
+            <EventList events={boysEvents} loading={false} />
           </div>
         )}
 
-        {/* Girls' Theater Events */}
-        {loading ? (
-           <div>
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 bg-pink-500/10 text-pink-600 dark:text-pink-400 font-semibold py-1 px-4 rounded-full mb-4">
-                <School className="h-5 w-5" />
-                <span>{lang === 'en' ? "Girls' Theater Events" : 'فعاليات مسرح البنات'}</span>
-              </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold font-headline text-foreground mb-2">
-                {lang === 'en' ? 'Spotlight On' : 'تحت الأضواء'}
-              </h2>
-            </div>
-            <EventList events={[]} loading={true} />
-          </div>
-        ) : girlsEvents.length > 0 && (
+        {!loading && girlsEvents.length > 0 && (
           <div>
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 bg-pink-500/10 text-pink-600 dark:text-pink-400 font-semibold py-1 px-4 rounded-full mb-4">
@@ -98,12 +99,12 @@ export default function Home() {
                 {lang === 'en' ? 'Discover the amazing performances at the girls\' theater.' : 'اكتشفي العروض المذهلة في مسرح البنات.'}
               </p>
             </div>
-            <EventList events={girlsEvents} loading={loading} />
+            <EventList events={girlsEvents} loading={false} />
           </div>
         )}
 
 
-        {events.length > 0 && (
+        {!loading && events.length > 0 && (
             <div className="text-center pt-8 border-t border-dashed">
                 <p className="text-muted-foreground mb-4">{lang === 'en' ? 'Or view all events in one place.' : 'أو شاهد جميع الفعاليات في مكان واحد.'}</p>
                 <Button variant="secondary" asChild>
