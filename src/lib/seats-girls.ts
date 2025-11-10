@@ -18,12 +18,13 @@ export const generateSeatsGirls = (): SeatingChart => {
   rowLetters.forEach((rowId) => {
     const row: SeatingRow = { id: rowId, seats: [] };
 
-    // Left Section
+    // Left Section (Numbered right-to-left, e.g., 8, 7, ..., 1)
     const leftSeatsCount = sectionSeatCounts.L[rowId] || 0;
-    // Add empty placeholders to the left to keep alignment
+    // Add empty placeholders to the left to keep alignment with longer rows below
     for (let i = 0; i < maxSeatsLeft - leftSeatsCount; i++) {
         row.seats.push({ id: `${rowId}L_empty_pad_${i}`, type: 'empty', section: 'left' });
     }
+    // Add the actual seats, numbering from count down to 1
     for (let i = leftSeatsCount; i >= 1; i--) {
       row.seats.push({ id: `${rowId}L${i}`, number: `${i}`, status: 'available', type: 'seat', section: 'left' });
     }
@@ -31,12 +32,12 @@ export const generateSeatsGirls = (): SeatingChart => {
     // Aisle 1
     row.seats.push({ id: `${rowId}A1`, type: 'aisle', section: 'aisle' });
 
-    // Center Section
+    // Center Section (Numbered left-to-right)
     const centerSeatsCount = sectionSeatCounts.C[rowId] || 0;
     for (let i = 1; i <= centerSeatsCount; i++) {
       row.seats.push({ id: `${rowId}C${i}`, number: `${i}`, status: 'available', type: 'seat', section: 'center' });
     }
-    // Add empty placeholders to fill remaining space
+     // Add empty placeholders to fill remaining space if the row is shorter than the max
      for (let i = 0; i < maxSeatsCenter - centerSeatsCount; i++) {
         row.seats.push({ id: `${rowId}C_empty_pad_${i}`, type: 'empty', section: 'center' });
     }
@@ -44,7 +45,7 @@ export const generateSeatsGirls = (): SeatingChart => {
     // Aisle 2
     row.seats.push({ id: `${rowId}A2`, type: 'aisle', section: 'aisle' });
 
-    // Right Section
+    // Right Section (Numbered left-to-right)
     const rightSeatsCount = sectionSeatCounts.R[rowId] || 0;
     for (let i = 1; i <= rightSeatsCount; i++) {
       row.seats.push({ id: `${rowId}R${i}`, number: `${i}`, status: 'available', type: 'seat', section: 'right' });
