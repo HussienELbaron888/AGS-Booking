@@ -16,7 +16,7 @@ export const generateSeats = (): SeatingChart => {
     row.seats.push({ id: `${rowId}A1`, type: 'aisle', section: 'aisle' });
 
     // Center section (12 seats)
-    if (rowId !== 'A') {
+    if (rowIndex !== 0) { // All rows except the first one ('A')
         for (let i = 1; i <= 12; i++) {
           row.seats.push({ id: `${rowId}C${i}`, number: `${i}`, status: 'available', type: 'seat', section: 'center' });
         }
