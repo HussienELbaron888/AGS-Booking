@@ -8,15 +8,21 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '@/lib/firebase';
+import { signOut } from 'firebase/auth';
 
 export function AppHeader() {
   const pathname = usePathname();
+  const router = useRouter();
+  const [user] = useAuthState(auth);
   const [lang, setLang] = useState('en');
   const [isClient, setIsClient] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -33,6 +39,8 @@ export function AppHeader() {
     };
 
     window.addEventListener('scroll', handleScroll);
+    handleScroll();
+
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -47,11 +55,16 @@ export function AppHeader() {
     setLang(prev => (prev === 'en' ? 'ar' : 'en'));
   };
 
+  const handleLogout = async () => {
+    await signOut(auth);
+    router.push('/');
+  };
+
   const navLinks = [
-    { href: '/', label: lang === 'en' ? 'Home' : 'الرئيسية' },
-    { href: '/calendar', label: lang === 'en' ? 'Calendar' : 'التقويم' },
-    { href: '/my-bookings', label: lang === 'en' ? 'My Bookings' : 'حجوزاتي' },
-    { href: '/admin', label: lang === 'en' ? 'Admin Panel' : 'لوحة التحكم' },
+    { href: '/', label: lang === 'en' ? 'Home' : 'الرئيسية', public: true },
+    { href: '/calendar', label: lang === 'en' ? 'Calendar' : 'التقويم', public: true },
+    { href: '/my-bookings', label: lang === 'en' ? 'My Bookings' : 'حجوزاتي', public: true },
+    { href: '/admin', label: lang === 'en' ? 'Admin Panel' : 'لوحة التحكم', public: false },
   ];
 
   const headerClasses = cn(
@@ -61,10 +74,13 @@ export function AppHeader() {
       'bg-background/95 text-foreground border-b shadow-sm backdrop-blur-sm': !isHomePage || isScrolled,
     }
   );
+  
+  const logoHeight = isHomePage && !isScrolled ? 56 : 40;
+  const headerHeight = isHomePage && !isScrolled ? 'h-24' : 'h-20';
 
   const NavContent = () => (
     <>
-      {navLinks.map(link => (
+      {navLinks.filter(link => link.public || user).map(link => (
         <Button key={link.href} variant="ghost" asChild className={cn(
           "font-semibold text-base transition-colors hover:text-primary",
           { 'text-primary': pathname === link.href, 
@@ -81,10 +97,10 @@ export function AppHeader() {
   );
 
   return (
-    <header className={headerClasses}>
-      <div className="container mx-auto flex items-center justify-between p-4 h-20">
+    <header className={cn(headerClasses, headerHeight)}>
+      <div className="container mx-auto flex items-center justify-between p-4">
         <Link href="/" className="flex items-center gap-3">
-          <Image src="/white logo.png" alt="AGS Logo" width={140} height={56} className="h-14 w-auto" />
+          <Image src="/white logo.png" alt="AGS Logo" width={140} height={logoHeight} className={`w-auto transition-all duration-300`} style={{ height: `${logoHeight}px` }} />
         </Link>
         <nav className="hidden md:flex items-center gap-2">
           <NavContent />
@@ -101,8 +117,19 @@ export function AppHeader() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-              <DropdownMenuItem>{lang === 'en' ? 'Profile' : 'الملف الشخصي'}</DropdownMenuItem>
-              <DropdownMenuItem>{lang === 'en' ? 'Logout' : 'تسجيل الخروج'}</DropdownMenuItem>
+              {user ? (
+                <>
+                  <DropdownMenuItem>{lang === 'en' ? 'Profile' : 'الملف الشخصي'}</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    {lang === 'en' ? 'Logout' : 'تسجيل الخروج'}
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <DropdownMenuItem onClick={() => router.push('/admin/login')}>
+                  {lang === 'en' ? 'Login' : 'تسجيل الدخول'}
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -126,7 +153,7 @@ export function AppHeader() {
                     </SheetClose>
                   </div>
                   <nav className="flex flex-col gap-4 mt-8">
-                     {navLinks.map(link => (
+                     {navLinks.filter(link => link.public || user).map(link => (
                         <SheetClose asChild key={link.href}>
                            <Link href={link.href} className={cn("font-semibold text-lg p-2 rounded-md transition-colors hover:bg-muted", { 'bg-muted text-primary': pathname === link.href })}>
                             {link.label}

@@ -68,7 +68,7 @@ export function NewHeroSlider({ events, loading }: NewHeroSliderProps) {
         >
           <Image
             src={currentEvent.image}
-            alt={currentEvent.name}
+            alt={lang === 'en' ? currentEvent.name : currentEvent.name_ar}
             fill
             className="object-cover"
             priority
@@ -87,10 +87,10 @@ export function NewHeroSlider({ events, loading }: NewHeroSliderProps) {
               className="max-w-2xl text-left rtl:text-right"
             >
                 <h1 className="text-5xl md:text-7xl font-extrabold font-headline uppercase tracking-tighter mb-4 drop-shadow-lg">
-                    {currentEvent.name}
+                    {lang === 'en' ? currentEvent.name : currentEvent.name_ar}
                 </h1>
                 <p className="text-xl md:text-2xl max-w-3xl text-white/90 mb-8 drop-shadow-md line-clamp-3">
-                    {currentEvent.description}
+                    {lang === 'en' ? currentEvent.description : currentEvent.description_ar}
                 </p>
                 <Button size="lg" asChild className="border-2 border-white bg-transparent hover:bg-white hover:text-black font-bold py-3 px-6 rounded-none">
                     <Link href={`/events/${currentEvent.id}`}>

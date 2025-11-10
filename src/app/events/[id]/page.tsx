@@ -4,13 +4,12 @@ import { notFound, useParams } from 'next/navigation';
 import { Calendar, Clock, Info, Users, Ticket } from 'lucide-react';
 import { SeatingChartWrapper } from '@/components/events/seating-chart-wrapper';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, use } from 'react';
 import type { Event } from '@/lib/types';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
-import React from 'react';
 
 interface EventPageProps {
   // params are no longer passed as a prop, but obtained via useParams hook

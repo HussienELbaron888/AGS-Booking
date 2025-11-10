@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { PanelLeft } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '@/lib/firebase';
+import { useRouter, usePathname } from 'next/navigation';
 
 export default function AdminLayout({
   children,
@@ -11,9 +14,13 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const [lang, setLang] = useState('en');
+  const [user, loading] = useAuthState(auth);
+  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
-    setLang(document.documentElement.lang || 'en');
+    const initialLang = document.documentElement.lang || 'en';
+    setLang(initialLang);
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.type === 'attributes' && mutation.attributeName === 'lang') {
@@ -25,8 +32,31 @@ export default function AdminLayout({
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    // If not loading and no user, and we are not on the login page, redirect to login
+    if (!loading && !user && pathname !== '/admin/login') {
+      router.push('/admin/login');
+    }
+  }, [user, loading, router, pathname]);
+
+  // While loading, show a loader
+  if (loading) {
+    return <div className="flex h-screen items-center justify-center"><p>Loading...</p></div>;
+  }
+
+  // If not a user and not on the login page, the redirect is happening, so we can return null or a loader
+  if (!user && pathname !== '/admin/login') {
+    return null; // Or a loading spinner
+  }
+
+  // If user is not logged in, only render the children (the login page)
+  if (!user) {
+    return <>{children}</>;
+  }
+
+  // If user is logged in, render the admin layout
   return (
-    <div className="flex min-h-[calc(100vh-65px)]">
+    <div className="flex min-h-screen pt-20">
       <AdminSidebar />
       <div className="md:hidden p-4">
         <Sheet>
