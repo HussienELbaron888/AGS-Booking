@@ -39,7 +39,7 @@ export default function Home() {
       <section id="events" className="container mx-auto py-16 px-4 space-y-16">
         
         {/* Boys' Theater Events */}
-        {loading || (boysEvents.length > 0) ? (
+        {(!loading && boysEvents.length > 0) ? (
           <div>
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 bg-primary/10 text-primary font-semibold py-1 px-4 rounded-full mb-4">
@@ -55,10 +55,23 @@ export default function Home() {
             </div>
             <EventList events={boysEvents} loading={loading} />
           </div>
+        ) : loading ? (
+          <div>
+            <div className="text-center mb-12">
+               <div className="inline-flex items-center gap-2 bg-primary/10 text-primary font-semibold py-1 px-4 rounded-full mb-4">
+                <Drama className="h-5 w-5" />
+                <span>{lang === 'en' ? "Boys' Theater Events" : 'فعاليات مسرح البنين'}</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-extrabold font-headline text-foreground mb-2">
+                {lang === 'en' ? 'Stage is Set' : 'العروض القادمة'}
+              </h2>
+            </div>
+            <EventList events={[]} loading={true} />
+          </div>
         ) : null}
 
         {/* Girls' Theater Events */}
-        {loading || (girlsEvents.length > 0) ? (
+        {(!loading && girlsEvents.length > 0) ? (
           <div>
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 bg-pink-500/10 text-pink-600 dark:text-pink-400 font-semibold py-1 px-4 rounded-full mb-4">
@@ -73,6 +86,19 @@ export default function Home() {
               </p>
             </div>
             <EventList events={girlsEvents} loading={loading} />
+          </div>
+        ) : loading ? (
+           <div>
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 bg-pink-500/10 text-pink-600 dark:text-pink-400 font-semibold py-1 px-4 rounded-full mb-4">
+                <School className="h-5 w-5" />
+                <span>{lang === 'en' ? "Girls' Theater Events" : 'فعاليات مسرح البنات'}</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-extrabold font-headline text-foreground mb-2">
+                {lang === 'en' ? 'Spotlight On' : 'تحت الأضواء'}
+              </h2>
+            </div>
+            <EventList events={[]} loading={true} />
           </div>
         ) : null}
 
