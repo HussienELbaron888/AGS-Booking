@@ -9,6 +9,7 @@ export interface Event {
   seatingChart: SeatingChart;
   targetAudience: string;
   keyHighlights: string;
+  venue: 'boys-theater' | 'girls-theater';
 }
 
 export interface SeatingChart {

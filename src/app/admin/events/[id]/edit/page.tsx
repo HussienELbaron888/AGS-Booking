@@ -22,7 +22,8 @@ const formSchema = z.object({
     .refine((files) => files === undefined || (files && Array.from(files).every(file => file.size <= 5 * 1024 * 1024)), `Max file size is 5MB.`)
     .optional(),
   targetAudience: z.string().min(1, 'Target audience is required'),
-  keyHighlights: z.string().min(1, 'Key highlights are required'),
+  keyHighlights: z.string().min(1, 'Key highlights is required'),
+  // Venue is not editable after creation
 });
 
 export default function EditEventPage({ params }: { params: { id: string } }) {

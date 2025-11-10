@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import type { Event } from '@/lib/types';
 import Image from 'next/image';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 interface EventFormProps {
   event?: Event;
@@ -37,12 +38,51 @@ export function EventForm({ event, onSubmit, isSubmitting, schema }: EventFormPr
           image: undefined,
           targetAudience: '',
           keyHighlights: '',
+          venue: 'boys-theater',
         },
   });
+
+  const isEditing = !!event;
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {!isEditing && (
+            <FormField
+            control={form.control}
+            name="venue"
+            render={({ field }) => (
+              <FormItem className="space-y-3">
+                <FormLabel>Venue</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    className="flex flex-col space-y-1"
+                  >
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="boys-theater" />
+                      </FormControl>
+                      <FormLabel className="font-normal">
+                        Boys' Theater
+                      </FormLabel>
+                    </FormItem>
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="girls-theater" />
+                      </FormControl>
+                      <FormLabel className="font-normal">
+                        Girls' Theater
+                      </FormLabel>
+                    </FormItem>
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
         <FormField
           control={form.control}
           name="name"

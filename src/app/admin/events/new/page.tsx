@@ -6,6 +6,7 @@ import { addDoc, collection } from 'firebase/firestore';
 import { db, storage } from '@/lib/firebase';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { generateSeats } from '@/lib/seats';
+import { generateSeatsGirls } from '@/lib/seats-girls';
 import * as z from 'zod';
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
@@ -22,6 +23,9 @@ const formSchema = z.object({
     .refine((files) => files && Array.from(files).every(file => file.size <= 5 * 1024 * 1024), `Max file size is 5MB.`),
   targetAudience: z.string().min(1, 'Target audience is required'),
   keyHighlights: z.string().min(1, 'Key highlights are required'),
+  venue: z.enum(['boys-theater', 'girls-theater'], {
+    required_error: "You need to select a venue.",
+  }),
 });
 
 export default function NewEventPage() {
@@ -52,6 +56,8 @@ export default function NewEventPage() {
       const uploadResult = await uploadBytes(storageRef, imageFile);
       const imageUrl = await getDownloadURL(uploadResult.ref);
       
+      const seatingChart = values.venue === 'boys-theater' ? generateSeats() : generateSeatsGirls();
+
       const newEventData = {
         name: values.name,
         date: values.date,
@@ -61,7 +67,8 @@ export default function NewEventPage() {
         image: imageUrl,
         targetAudience: values.targetAudience,
         keyHighlights: values.keyHighlights,
-        seatingChart: generateSeats(),
+        venue: values.venue,
+        seatingChart: seatingChart,
       };
       
       await addDoc(eventsCollection, newEventData);
