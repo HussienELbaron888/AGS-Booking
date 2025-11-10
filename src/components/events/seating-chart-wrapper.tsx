@@ -24,16 +24,10 @@ export function SeatingChartWrapper({ event: initialEvent }: SeatingChartWrapper
   const [lang, setLang] = useState('en');
 
   useEffect(() => {
-    // Force refresh event data on component mount to bypass cache
-    const fetchEventData = async () => {
-      const eventRef = doc(db, 'events', initialEvent.id);
-      const docSnap = await getDoc(eventRef);
-      if (docSnap.exists()) {
-        setEvent(docSnap.data() as Event);
-      }
-    };
-    fetchEventData();
+    setEvent(initialEvent);
+  }, [initialEvent]);
 
+  useEffect(() => {
     setLang(document.documentElement.lang || 'en');
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
@@ -44,7 +38,7 @@ export function SeatingChartWrapper({ event: initialEvent }: SeatingChartWrapper
     });
     observer.observe(document.documentElement, { attributes: true });
     return () => observer.disconnect();
-  }, [initialEvent.id]);
+  }, []);
 
   const handleSeatClick = (seat: Seat) => {
     if (seat.status !== 'available') return;
