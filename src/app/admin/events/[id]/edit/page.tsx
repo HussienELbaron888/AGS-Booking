@@ -17,8 +17,6 @@ const formSchema = z.object({
   time: z.string().min(1, 'Time is required'),
   description_en: z.string().min(1, 'English short description is required'),
   description_ar: z.string().min(1, 'Arabic short description is required'),
-  longDescription_en: z.string().min(1, 'English long description is required'),
-  longDescription_ar: z.string().min(1, 'Arabic long description is required'),
   image: z
     .custom<FileList>()
     .refine((files) => files === undefined || (files && files.length > 0), 'Image is required')
@@ -70,9 +68,6 @@ export default function EditEventPage({ params }: { params: { id: string } }) {
         description: values.description_en, // fallback
         description_en: values.description_en,
         description_ar: values.description_ar,
-        longDescription: values.longDescription_en, // fallback
-        longDescription_en: values.longDescription_en,
-        longDescription_ar: values.longDescription_ar,
         image: imageUrl,
         keyHighlights: values.keyHighlights,
       };

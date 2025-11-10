@@ -34,8 +34,6 @@ export function EventForm({ event, onSubmit, isSubmitting, schema }: EventFormPr
           name_ar: event.name_ar || '',
           description_en: event.description_en || event.description,
           description_ar: event.description_ar || '',
-          longDescription_en: event.longDescription_en || event.longDescription,
-          longDescription_ar: event.longDescription_ar || '',
           image: undefined 
         }
       : {
@@ -45,8 +43,6 @@ export function EventForm({ event, onSubmit, isSubmitting, schema }: EventFormPr
           time: '',
           description_en: '',
           description_ar: '',
-          longDescription_en: '',
-          longDescription_ar: '',
           image: undefined,
           keyHighlights: '',
           venue: 'boys-theater',
@@ -171,32 +167,6 @@ export function EventForm({ event, onSubmit, isSubmitting, schema }: EventFormPr
               <FormLabel>Short Description (Arabic)</FormLabel>
               <FormControl>
                 <Textarea placeholder="وصف مختصر" {...field} dir="rtl"/>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="longDescription_en"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Long Description (English)</FormLabel>
-              <FormControl>
-                <Textarea placeholder="Detailed description" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="longDescription_ar"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Long Description (Arabic)</FormLabel>
-              <FormControl>
-                <Textarea placeholder="وصف تفصيلي" {...field} dir="rtl"/>
               </FormControl>
               <FormMessage />
             </FormItem>

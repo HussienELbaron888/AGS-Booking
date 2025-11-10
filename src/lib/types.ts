@@ -8,9 +8,6 @@ export interface Event {
   description: string;
   description_en: string;
   description_ar: string;
-  longDescription: string;
-  longDescription_en: string;
-  longDescription_ar: string;
   image: string;
   seatingChart: SeatingChart;
   keyHighlights: string;

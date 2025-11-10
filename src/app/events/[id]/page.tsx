@@ -45,7 +45,7 @@ export default function EventPage({}: EventPageProps) {
     const docRef = doc(db, 'events', id);
     const unsubscribe = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
-        const data = docSnap.data() as Event;
+        const data = docSnap.data() as any; // Use any to handle old data structure
         // This ensures backward compatibility with events that don't have the new fields
         const fullEvent: Event = {
           id: docSnap.id,
@@ -54,8 +54,6 @@ export default function EventPage({}: EventPageProps) {
           name_ar: data.name_ar || data.name,
           description_en: data.description_en || data.description,
           description_ar: data.description_ar || data.description,
-          longDescription_en: data.longDescription_en || data.longDescription,
-          longDescription_ar: data.longDescription_ar || data.longDescription,
         };
         setEvent(fullEvent);
       } else {
@@ -87,7 +85,7 @@ export default function EventPage({}: EventPageProps) {
   const imagePlaceholder = PlaceHolderImages.find(p => p.imageUrl === event.image);
 
   const eventName = lang === 'ar' ? event.name_ar : event.name_en;
-  const longDescription = lang === 'ar' ? event.longDescription_ar : event.longDescription_en;
+  const description = lang === 'ar' ? event.description_ar : event.description_en;
   const keyHighlights = event.keyHighlights;
 
 
@@ -127,7 +125,7 @@ export default function EventPage({}: EventPageProps) {
             </div>
             <div className="flex items-start gap-3">
               <Info className="h-5 w-5 text-accent mt-1 shrink-0" />
-              <p>{longDescription}</p>
+              <p>{description}</p>
             </div>
              <div className="flex items-start gap-3">
               <Users className="h-5 w-5 text-accent mt-1 shrink-0" />
