@@ -11,18 +11,20 @@ import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
 
 const formSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
+  name_en: z.string().min(1, 'English name is required'),
+  name_ar: z.string().min(1, 'Arabic name is required'),
   date: z.string().min(1, 'Date is required'),
   time: z.string().min(1, 'Time is required'),
-  description: z.string().min(1, 'Description is required'),
-  longDescription: z.string().min(1, 'Long description is required'),
+  description_en: z.string().min(1, 'English short description is required'),
+  description_ar: z.string().min(1, 'Arabic short description is required'),
+  longDescription_en: z.string().min(1, 'English long description is required'),
+  longDescription_ar: z.string().min(1, 'Arabic long description is required'),
   image: z
     .custom<FileList>()
     .refine((files) => files === undefined || (files && files.length > 0), 'Image is required')
     .refine((files) => files === undefined || (files && Array.from(files).every(file => file.size <= 5 * 1024 * 1024)), `Max file size is 5MB.`)
     .optional(),
-  targetAudience: z.string().min(1, 'Target audience is required'),
-  keyHighlights: z.string().min(1, 'Key highlights is required'),
+  keyHighlights: z.string().min(1, 'Key highlights are required'),
   // Venue is not editable after creation
 });
 
@@ -60,13 +62,18 @@ export default function EditEventPage({ params }: { params: { id: string } }) {
       }
       
       const updatedEvent = {
-        name: values.name,
+        name: values.name_en, // fallback
+        name_en: values.name_en,
+        name_ar: values.name_ar,
         date: values.date,
         time: values.time,
-        description: values.description,
-        longDescription: values.longDescription,
+        description: values.description_en, // fallback
+        description_en: values.description_en,
+        description_ar: values.description_ar,
+        longDescription: values.longDescription_en, // fallback
+        longDescription_en: values.longDescription_en,
+        longDescription_ar: values.longDescription_ar,
         image: imageUrl,
-        targetAudience: values.targetAudience,
         keyHighlights: values.keyHighlights,
       };
 

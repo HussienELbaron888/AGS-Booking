@@ -28,15 +28,26 @@ export function EventForm({ event, onSubmit, isSubmitting, schema }: EventFormPr
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: event
-      ? { ...event, image: undefined } // Clear image field for file input
+      ? { 
+          ...event,
+          name_en: event.name_en || event.name,
+          name_ar: event.name_ar || '',
+          description_en: event.description_en || event.description,
+          description_ar: event.description_ar || '',
+          longDescription_en: event.longDescription_en || event.longDescription,
+          longDescription_ar: event.longDescription_ar || '',
+          image: undefined 
+        }
       : {
-          name: '',
+          name_en: '',
+          name_ar: '',
           date: '',
           time: '',
-          description: '',
-          longDescription: '',
+          description_en: '',
+          description_ar: '',
+          longDescription_en: '',
+          longDescription_ar: '',
           image: undefined,
-          targetAudience: '',
           keyHighlights: '',
           venue: 'boys-theater',
         },
@@ -46,7 +57,7 @@ export function EventForm({ event, onSubmit, isSubmitting, schema }: EventFormPr
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-1">
         {!isEditing && (
             <FormField
             control={form.control}
@@ -83,51 +94,68 @@ export function EventForm({ event, onSubmit, isSubmitting, schema }: EventFormPr
             )}
           />
         )}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="name_en"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name (English)</FormLabel>
+                <FormControl>
+                  <Input placeholder="Event name in English" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="name_ar"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name (Arabic)</FormLabel>
+                <FormControl>
+                  <Input placeholder="اسم الحدث بالعربية" {...field} dir="rtl"/>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="date"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Date</FormLabel>
+                <FormControl>
+                  <Input type="date" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="time"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Time</FormLabel>
+                <FormControl>
+                  <Input type="time" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
         <FormField
           control={form.control}
-          name="name"
+          name="description_en"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Event name" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="date"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Date</FormLabel>
-              <FormControl>
-                <Input type="date" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="time"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Time</FormLabel>
-              <FormControl>
-                <Input type="time" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
+              <FormLabel>Short Description (English)</FormLabel>
               <FormControl>
                 <Textarea placeholder="Short description" {...field} />
               </FormControl>
@@ -137,12 +165,38 @@ export function EventForm({ event, onSubmit, isSubmitting, schema }: EventFormPr
         />
         <FormField
           control={form.control}
-          name="longDescription"
+          name="description_ar"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Long Description</FormLabel>
+              <FormLabel>Short Description (Arabic)</FormLabel>
+              <FormControl>
+                <Textarea placeholder="وصف مختصر" {...field} dir="rtl"/>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="longDescription_en"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Long Description (English)</FormLabel>
               <FormControl>
                 <Textarea placeholder="Detailed description" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="longDescription_ar"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Long Description (Arabic)</FormLabel>
+              <FormControl>
+                <Textarea placeholder="وصف تفصيلي" {...field} dir="rtl"/>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -173,19 +227,6 @@ export function EventForm({ event, onSubmit, isSubmitting, schema }: EventFormPr
         />
         <FormField
           control={form.control}
-          name="targetAudience"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Target Audience</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g., Parents, students" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
           name="keyHighlights"
           render={({ field }) => (
             <FormItem>
@@ -197,7 +238,7 @@ export function EventForm({ event, onSubmit, isSubmitting, schema }: EventFormPr
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" disabled={isSubmitting} className="w-full">
           {isSubmitting ? 'Saving...' : event ? 'Update Event' : 'Create Event'}
         </Button>
       </form>

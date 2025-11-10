@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import { notFound, useParams } from 'next/navigation';
-import { Calendar, Clock, Info, Users } from 'lucide-react';
+import { Calendar, Clock, Info, Users, Ticket } from 'lucide-react';
 import { SeatingChartWrapper } from '@/components/events/seating-chart-wrapper';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useEffect, useState } from 'react';
@@ -45,7 +45,19 @@ export default function EventPage({}: EventPageProps) {
     const docRef = doc(db, 'events', id);
     const unsubscribe = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
-        setEvent({ id: docSnap.id, ...docSnap.data() } as Event);
+        const data = docSnap.data() as Event;
+        // This ensures backward compatibility with events that don't have the new fields
+        const fullEvent: Event = {
+          id: docSnap.id,
+          ...data,
+          name_en: data.name_en || data.name,
+          name_ar: data.name_ar || data.name,
+          description_en: data.description_en || data.description,
+          description_ar: data.description_ar || data.description,
+          longDescription_en: data.longDescription_en || data.longDescription,
+          longDescription_ar: data.longDescription_ar || data.longDescription,
+        };
+        setEvent(fullEvent);
       } else {
         setEvent(null);
         notFound();
@@ -58,9 +70,6 @@ export default function EventPage({}: EventPageProps) {
       });
       errorEmitter.emit('permission-error', permissionError);
       setLoading(false);
-      // We can show a generic error to the user, the detailed one is in the console
-      // for development. Or we could choose to show notFound().
-      // For now, let's just indicate an error state.
       setEvent(null); 
     });
 
@@ -72,12 +81,15 @@ export default function EventPage({}: EventPageProps) {
   }
 
   if (!event) {
-    // This can happen if the event is not found or if there's a permission error.
-    // The console will have the detailed error for developers.
     return <div>Event not found or access denied.</div>;
   }
 
   const imagePlaceholder = PlaceHolderImages.find(p => p.imageUrl === event.image);
+
+  const eventName = lang === 'ar' ? event.name_ar : event.name_en;
+  const longDescription = lang === 'ar' ? event.longDescription_ar : event.longDescription_en;
+  const keyHighlights = event.keyHighlights;
+
 
   return (
     <div className="container mx-auto py-10 px-4">
@@ -86,14 +98,14 @@ export default function EventPage({}: EventPageProps) {
           <div className="relative aspect-[3/2] rounded-lg overflow-hidden shadow-lg mb-6">
             <Image
               src={event.image}
-              alt={event.name}
+              alt={eventName}
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               data-ai-hint={imagePlaceholder?.imageHint}
             />
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold font-headline text-primary mb-4">{lang === 'ar' ? event.name : event.name}</h1>
+          <h1 className="text-3xl md:text-4xl font-bold font-headline text-primary mb-4">{eventName}</h1>
           
           <div className="space-y-4 text-muted-foreground mb-6">
             <div className="flex items-center gap-3">
@@ -104,13 +116,22 @@ export default function EventPage({}: EventPageProps) {
               <Clock className="h-5 w-5 text-accent" />
               <span className="font-medium">{event.time}</span>
             </div>
+            <div className="flex items-center gap-3">
+                <Ticket className="h-5 w-5 text-accent" />
+                <span className="font-medium">
+                  {lang === 'ar' 
+                    ? `${event.seatsAvailable} مقعد متاح من أصل ${event.totalSeats}`
+                    : `${event.seatsAvailable} / ${event.totalSeats} seats available`
+                  }
+                </span>
+            </div>
             <div className="flex items-start gap-3">
               <Info className="h-5 w-5 text-accent mt-1 shrink-0" />
-              <p>{lang === 'ar' ? event.longDescription : event.longDescription}</p>
+              <p>{longDescription}</p>
             </div>
              <div className="flex items-start gap-3">
               <Users className="h-5 w-5 text-accent mt-1 shrink-0" />
-              <p><span className="font-semibold text-foreground/80">{lang === 'en' ? 'Highlights:' : 'أهم النقاط:'}</span> {lang === 'ar' ? event.keyHighlights : event.keyHighlights}</p>
+              <p><span className="font-semibold text-foreground/80">{lang === 'en' ? 'Highlights:' : 'أهم النقاط:'}</span> {keyHighlights}</p>
             </div>
           </div>
         </div>

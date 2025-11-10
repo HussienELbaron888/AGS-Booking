@@ -87,7 +87,11 @@ export function SeatingChartWrapper({ event: initialEvent }: SeatingChartWrapper
           }
   
           if (canBook) {
-            transaction.update(eventRef, { seatingChart: newSeatingChart });
+            const newSeatsAvailable = currentEventData.seatsAvailable - selectedSeats.length;
+            transaction.update(eventRef, { 
+              seatingChart: newSeatingChart,
+              seatsAvailable: newSeatsAvailable < 0 ? 0 : newSeatsAvailable
+            });
           } else {
             return Promise.reject(new Error(errorMessage || "One or more seats are no longer available."));
           }
@@ -114,15 +118,7 @@ export function SeatingChartWrapper({ event: initialEvent }: SeatingChartWrapper
     setSelectedSeats([]);
     setBookingStatus('idle');
     setErrorMessage('');
-    // Refetch data to show the latest seating chart status after a reset
-    const fetchEventData = async () => {
-      const eventRef = doc(db, 'events', initialEvent.id);
-      const docSnap = await getDoc(eventRef);
-      if (docSnap.exists()) {
-        setEvent(docSnap.data() as Event);
-      }
-    };
-    fetchEventData();
+    // No need to manually refetch, onSnapshot will provide updates
   }
 
   if (bookingStatus === 'booked') {
