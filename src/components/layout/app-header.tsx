@@ -84,7 +84,7 @@ export function AppHeader() {
     <header className={headerClasses}>
       <div className="container mx-auto flex items-center justify-between p-4 h-20">
         <Link href="/" className="flex items-center gap-3">
-          <Image src="/white logo.png" alt="AGS Logo" width={100} height={40} className="h-10 w-auto" />
+          <Image src="/white logo.png" alt="AGS Logo" width={140} height={56} className="h-14 w-auto" />
         </Link>
         <nav className="hidden md:flex items-center gap-2">
           <NavContent />
@@ -117,7 +117,7 @@ export function AppHeader() {
                 <div className="flex flex-col h-full">
                   <div className="flex items-center justify-between border-b pb-4">
                      <Link href="/" className="flex items-center gap-3">
-                        <Image src="/white logo.png" alt="AGS Logo" width={100} height={40} className="h-10 w-auto" />
+                        <Image src="/white logo.png" alt="AGS Logo" width={140} height={56} className="h-14 w-auto" />
                     </Link>
                     <SheetClose asChild>
                       <Button variant="ghost" size="icon">
