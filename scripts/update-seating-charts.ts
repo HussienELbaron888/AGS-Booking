@@ -1,4 +1,4 @@
-import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, updateDoc, doc, writeBatch } from 'firebase/firestore';
 import { db } from '../src/lib/firebase'; // Adjust this path if needed
 import { generateSeats } from '../src/lib/seats'; // Adjust this path if needed
 
@@ -14,20 +14,20 @@ const updateSeatingCharts = async () => {
       return;
     }
 
+    const batch = writeBatch(db);
     const newSeatingChart = generateSeats();
-    let updatedCount = 0;
 
     for (const docSnapshot of querySnapshot.docs) {
       const eventDocRef = doc(db, 'events', docSnapshot.id);
       // Using a deep copy to prevent object mutation issues across updates
-      await updateDoc(eventDocRef, {
+      batch.update(eventDocRef, {
         seatingChart: JSON.parse(JSON.stringify(newSeatingChart))
       });
-      updatedCount++;
-      console.log(`Updated seating chart for event: ${docSnapshot.id}`);
+      console.log(`Queued update for event: ${docSnapshot.id}`);
     }
-
-    console.log(`Successfully updated seating charts for ${updatedCount} events.`);
+    
+    await batch.commit();
+    console.log(`Successfully updated seating charts for ${querySnapshot.size} events.`);
 
   } catch (error) {
     console.error('Error updating seating charts:', error);
