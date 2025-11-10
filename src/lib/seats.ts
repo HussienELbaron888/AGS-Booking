@@ -8,8 +8,8 @@ export const generateSeats = (): SeatingChart => {
   rowLetters.forEach((rowId) => {
     const row: SeatingRow = { id: rowId, seats: [] };
 
-    // Left section (7 seats) - Numbering from left to right
-    for (let i = 1; i <= 7; i++) {
+    // Left section (7 seats) - Numbering from right to left (7 down to 1)
+    for (let i = 7; i >= 1; i--) {
       row.seats.push({ id: `${rowId}L${i}`, number: `${i}`, status: 'available', type: 'seat', section: 'left' });
     }
 
