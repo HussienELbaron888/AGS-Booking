@@ -1,26 +1,16 @@
 'use client';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Ticket } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useLanguage } from "@/context/language-context"; // 1. Import the hook
 
 export default function MyBookingsPage() {
-  const [lang, setLang] = useState('en');
+  const { lang } = useLanguage(); // 2. Use the hook to get the current language
 
-  useEffect(() => {
-    setLang(document.documentElement.lang || 'en');
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.type === 'attributes' && mutation.attributeName === 'lang') {
-          setLang(document.documentElement.lang || 'en');
-        }
-      });
-    });
-    observer.observe(document.documentElement, { attributes: true });
-    return () => observer.disconnect();
-  }, []);
+  // The old useState and useEffect for language have been removed.
 
   return (
-    <div className="container mx-auto py-10 px-4">
+    // 3. Adjust the top padding to push content below the header
+    <div className="container mx-auto pt-28 pb-10 px-4">
       <Card>
         <CardHeader>
           <div className="flex items-center gap-4">

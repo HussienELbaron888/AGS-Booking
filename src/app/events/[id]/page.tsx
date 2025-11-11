@@ -4,36 +4,26 @@ import { notFound, useParams } from 'next/navigation';
 import { Calendar, Clock, Info, Users, Ticket } from 'lucide-react';
 import { SeatingChartWrapper } from '@/components/events/seating-chart-wrapper';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import React, { useEffect, useState, use } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { Event } from '@/lib/types';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
+import { useLanguage } from "@/context/language-context"; // 1. Import the hook
 
 interface EventPageProps {
   // params are no longer passed as a prop, but obtained via useParams hook
 }
 
 export default function EventPage({}: EventPageProps) {
-  const [lang, setLang] = useState('en');
+  const { lang } = useLanguage(); // 2. Use the hook to get the current language
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const params = useParams();
   const id = params.id as string;
 
-  useEffect(() => {
-    setLang(document.documentElement.lang || 'en');
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.type === 'attributes' && mutation.attributeName === 'lang') {
-          setLang(document.documentElement.lang || 'en');
-        }
-      });
-    });
-    observer.observe(document.documentElement, { attributes: true });
-    return () => observer.disconnect();
-  }, []);
+  // The old useState and useEffect for language have been removed.
 
   useEffect(() => {
     if (!id) {
@@ -87,9 +77,9 @@ export default function EventPage({}: EventPageProps) {
   const description = lang === 'ar' ? event.description_ar : event.description_en;
   const keyHighlights = event.keyHighlights;
 
-
   return (
-    <div className="container mx-auto py-10 px-4">
+    // 3. Adjust the top padding to push content below the header
+    <div className="container mx-auto pt-28 pb-10 px-4">
       <div className="grid lg:grid-cols-5 gap-12">
         <div className="lg:col-span-2">
           <div className="relative aspect-[3/2] rounded-lg overflow-hidden shadow-lg mb-6">
