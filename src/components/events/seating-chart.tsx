@@ -11,9 +11,10 @@ interface SeatingChartProps {
   seatingChart: SeatingChartType;
   selectedSeats: SeatType[];
   onSeatClick: (seat: SeatType) => void;
+  isBookingFinalized?: boolean;
 }
 
-export function SeatingChart({ seatingChart, selectedSeats, onSeatClick }: SeatingChartProps) {
+export function SeatingChart({ seatingChart, selectedSeats, onSeatClick, isBookingFinalized }: SeatingChartProps) {
   const [scale, setScale] = useState(1);
   const seatSize = 28; 
   const gapSize = 6;
@@ -55,8 +56,9 @@ export function SeatingChart({ seatingChart, selectedSeats, onSeatClick }: Seati
       <div className="bg-muted/50 p-2 rounded-md mb-4 flex items-center justify-between">
         <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs items-center">
             <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm border bg-card"></div>{lang === 'en' ? 'Available' : 'متاح'}</div>
-            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-green-500"></div>{lang === 'en' ? 'Selected' : 'محدد'}</div>
-            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-red-500 opacity-50"></div>{lang === 'en' ? 'Blocked' : 'محجوز'}</div>
+            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-primary"></div>{lang === 'en' ? 'Selected' : 'محدد'}</div>
+            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-yellow-500"></div>{lang === 'en' ? 'Reserved' : 'محجوز مؤقتاً'}</div>
+            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-destructive/50"></div>{lang === 'en' ? 'Booked' : 'محجوز'}</div>
         </div>
         <div className="flex items-center gap-1">
           <Button variant="outline" size="icon" onClick={handleZoomOut} className="h-8 w-8"><ZoomOut className="h-4 w-4" /></Button>
@@ -89,6 +91,7 @@ export function SeatingChart({ seatingChart, selectedSeats, onSeatClick }: Seati
                       seat={seat}
                       isSelected={selectedSeats.some(s => s.id === seat.id)}
                       onClick={onSeatClick}
+                      isClickable={!isBookingFinalized}
                       size={seatSize}
                     />
                   ))}

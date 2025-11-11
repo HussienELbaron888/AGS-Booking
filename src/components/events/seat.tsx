@@ -7,6 +7,7 @@ interface SeatProps {
   seat: SeatType;
   isSelected: boolean;
   onClick: (seat: SeatType) => void;
+  isClickable: boolean;
   size: number;
 }
 
@@ -16,30 +17,35 @@ const seatIcon = (
   </svg>
 );
 
-
-export function Seat({ seat, isSelected, onClick, size }: SeatProps) {
+export function Seat({ seat, isSelected, onClick, isClickable, size }: SeatProps) {
   if (seat.type === 'aisle' || seat.type === 'empty') {
     return <div style={{ width: `${size}px`, height: `${size}px` }} />;
   }
 
+  const canBeClicked = isClickable && seat.status === 'available';
   const currentStatus = isSelected ? 'selected' : seat.status;
-  
-  const isClickable = seat.status === 'available';
 
   return (
     <button
       aria-label={`Seat ${seat.id}, Status: ${currentStatus}`}
-      onClick={() => isClickable && onClick(seat)}
-      disabled={!isClickable && !isSelected}
+      onClick={() => canBeClicked && onClick(seat)}
+      disabled={!canBeClicked && !isSelected}
       style={{ width: `${size}px`, height: `${size}px` }}
       className={cn(
         'flex items-center justify-center rounded-t-md transition-all duration-200 relative',
         {
-          'cursor-pointer': isClickable || isSelected,
-          'cursor-not-allowed': !isClickable && !isSelected,
-          'text-card-foreground/50 hover:text-green-500 hover:scale-110': seat.status === 'available',
-          'text-green-500 scale-110 shadow-lg': isSelected,
-          'text-red-500 opacity-50': seat.status === 'reserved' || seat.status === 'unavailable' || seat.status === 'blocked',
+          'cursor-pointer': canBeClicked || isSelected,
+          'cursor-not-allowed': !canBeClicked && !isSelected,
+          // Base styles for an available seat
+          'text-card-foreground/50 hover:text-primary hover:scale-110': seat.status === 'available',
+          // When a seat is selected by the user
+          'text-primary scale-110 shadow-lg': isSelected,
+          // When a seat is temporarily reserved (cash booking)
+          'text-yellow-500 opacity-80': seat.status === 'reserved',
+          // When a seat is permanently booked (paid)
+          'text-destructive/50': seat.status === 'booked',
+           // Legacy statuses
+          'text-destructive/50': seat.status === 'unavailable' || seat.status === 'blocked',
         }
       )}
     >
