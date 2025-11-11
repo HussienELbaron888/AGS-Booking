@@ -18,41 +18,30 @@ import { cn } from '@/lib/utils';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '@/lib/firebase';
 import { signOut } from 'firebase/auth';
+import { useLanguage } from '@/context/language-context';
 
 export function AppHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const [user] = useAuthState(auth);
-  const [lang, setLang] = useState('en');
-  const [isClient, setIsClient] = useState(false);
+  const { lang, setLang } = useLanguage(); // Use language from context
   const [isScrolled, setIsScrolled] = useState(false);
 
   const isHomePage = pathname === '/';
 
   useEffect(() => {
-    setIsClient(true);
-    const initialLang = document.documentElement.lang || 'en';
-    setLang(initialLang);
-
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
 
     window.addEventListener('scroll', handleScroll);
-    handleScroll();
+    handleScroll(); // Set initial state
 
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => {
-    if (isClient) {
-      document.documentElement.lang = lang;
-      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-    }
-  }, [lang, isClient]);
-
   const toggleLang = () => {
-    setLang(prev => (prev === 'en' ? 'ar' : 'en'));
+    setLang(lang === 'en' ? 'ar' : 'en');
   };
 
   const handleLogout = async () => {
