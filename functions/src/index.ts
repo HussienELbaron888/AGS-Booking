@@ -339,3 +339,5 @@ export const verifyPayment = https.onCall(async (data, context) => {
     throw new https.HttpsError("internal", "Payment verification failed.");
   }
 });
+
+// Force rebuild
